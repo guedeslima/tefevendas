@@ -859,23 +859,15 @@ function restartAuto(){clearInterval(cAuto);startCarouselAuto();}
 function filterAds(){if(document.getElementById('searchInput').value){activeCat='Todos';document.getElementById('homeView').style.display='none';document.getElementById('mainHeader').style.display='flex';document.getElementById('mainTitle').textContent='Resultados';renderTopNav();renderCatsGrid();}renderAds();}
 
 // ===== SECRET TRIGGER =====
-// Acesse: seusite.com#admin para abrir o painel
-var adminClicks=0,adminTimer=null;
-function adminClick(){
-  adminClicks++;
-  clearTimeout(adminTimer);
-  if(adminClicks>=5){adminClicks=0;openPin();return;}
-  adminTimer=setTimeout(function(){adminClicks=0;},2000);
-}
-// Também abre pelo URL #admin
+// Clique nos 3 quadradinhos no rodapé ou acesse #admin na URL
 function checkHash(){
   if(window.location.hash==='#admin'){
-    window.location.hash='';
+    history.replaceState(null,null,' ');
     openPin();
   }
 }
 window.addEventListener('hashchange',checkHash);
-window.addEventListener('load',checkHash);
+document.addEventListener('DOMContentLoaded',checkHash);
 
 // ===== PIN =====
 const MAX_ATT=3,LOCK_S=300;var pbuf='',pinAtt=parseInt(localStorage.getItem('pinAtt')||'0'),lockTimer=null;
