@@ -403,7 +403,11 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
           <div class="pag-row" id="prodPag"></div>
           <a class="wpp-prod" id="prodWpp" href="#" target="_blank">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Chamar no WhatsApp
+            WhatsApp Principal
+          </a>
+          <a class="wpp-prod" id="prodWpp2" href="#" target="_blank" style="display:none;background:#1a9e50;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp Alternativo
           </a>
           <button class="share-btn" onclick="shareAd()">🔗 Compartilhar</button>
           <div class="safety-box">⚠️ <strong>Atenção!</strong> Nunca pague antes de ver o produto. Combine em local seguro.</div>
@@ -481,27 +485,50 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
       </div>
       <!-- CONFIG -->
       <div class="tcont" id="tCfg">
-        <div class="alabel">Aparência</div>
-        <input class="ainput" type="text" id="cfgNome" placeholder="Nome do site"/>
-        <input class="ainput" type="text" id="cfgCidade" placeholder="Cidade, Estado"/>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:13px;">
-          <input type="color" id="cfgCor" style="width:46px;height:38px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;padding:2px;"/>
-          <span style="font-size:12px;color:var(--muted);">Cor principal</span>
+        <div style="background:#fff3f0;border-radius:8px;padding:14px;margin-bottom:16px;border-left:3px solid var(--red);">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">📊 Resumo do site</div>
+          <div style="font-size:12px;color:#666;line-height:1.8;">
+            Anúncios: <strong id="cfgStatAds">0</strong> &nbsp;·&nbsp;
+            Categorias: <strong id="cfgStatCats">0</strong> &nbsp;·&nbsp;
+            Banners: <strong id="cfgStatBans">0</strong>
+          </div>
         </div>
-        <button class="mred" onclick="salvarAparencia()">Salvar aparência</button>
+        <div class="alabel">🎨 Aparência do site</div>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Nome do site</label>
+        <input class="ainput" type="text" id="cfgNome" placeholder="Ex: TeféVendas"/>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Cidade</label>
+        <input class="ainput" type="text" id="cfgCidade" placeholder="Ex: Tefé, AM"/>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Cor principal</label>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">
+          <input type="color" id="cfgCor" style="width:46px;height:38px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;padding:2px;"/>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span onclick="document.getElementById('cfgCor').value='#d4300a'" style="width:28px;height:28px;background:#d4300a;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ddd;" title="Vermelho"></span>
+            <span onclick="document.getElementById('cfgCor').value='#1a5fb5'" style="width:28px;height:28px;background:#1a5fb5;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ddd;" title="Azul"></span>
+            <span onclick="document.getElementById('cfgCor').value='#1a7a3c'" style="width:28px;height:28px;background:#1a7a3c;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ddd;" title="Verde"></span>
+            <span onclick="document.getElementById('cfgCor').value='#7c3aed'" style="width:28px;height:28px;background:#7c3aed;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ddd;" title="Roxo"></span>
+            <span onclick="document.getElementById('cfgCor').value='#1a1a1a'" style="width:28px;height:28px;background:#1a1a1a;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ddd;" title="Preto"></span>
+            <span onclick="document.getElementById('cfgCor').value='#e67e22'" style="width:28px;height:28px;background:#e67e22;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ddd;" title="Laranja"></span>
+          </div>
+        </div>
+        <button class="mred" onclick="salvarAparencia()">💾 Salvar aparência</button>
         <div class="adiv"></div>
-        <div class="alabel">Meu WhatsApp</div>
+        <div class="alabel">📱 WhatsApp para receber pedidos</div>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Número principal (com DDI 55)</label>
         <input class="ainput" type="tel" id="cfgWpp" placeholder="5597999999999"/>
-        <button class="mred" onclick="salvarWpp()">Salvar WhatsApp</button>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Mensagem padrão do botão "Falar no WhatsApp"</label>
+        <input class="ainput" type="text" id="cfgWppMsg" placeholder="Ex: Olá! Quero anunciar no TeféVendas!"/>
+        <button class="mred" onclick="salvarWpp()">💾 Salvar WhatsApp</button>
         <div class="adiv"></div>
-        <div class="alabel">Valor por anúncio</div>
+        <div class="alabel">💰 Valor cobrado por anúncio</div>
         <input class="ainput" type="text" id="cfgPreco" placeholder="Ex: R$ 10"/>
-        <button class="mred" onclick="salvarPreco()">Salvar valor</button>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Aparece no banner "Quer vender algo aqui?"</p>
+        <button class="mred" onclick="salvarPreco()">💾 Salvar valor</button>
         <div class="adiv"></div>
-        <div class="alabel">Alterar senha (6 dígitos)</div>
+        <div class="alabel">🔐 Segurança</div>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Nova senha (6 dígitos)</label>
         <input class="ainput" type="password" id="cfgPin1" placeholder="Nova senha" maxlength="6"/>
-        <input class="ainput" type="password" id="cfgPin2" placeholder="Confirmar" maxlength="6"/>
-        <button class="mred" onclick="salvarPin()">Alterar senha</button>
+        <input class="ainput" type="password" id="cfgPin2" placeholder="Confirmar nova senha" maxlength="6"/>
+        <button class="mred" onclick="salvarPin()">🔐 Alterar senha</button>
       </div>
     </div>
   </div>
@@ -518,7 +545,10 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
       <div><label class="flabel">Preço *</label><input class="finput" type="text" id="adPreco" placeholder="Ex: 1.200,00 ou A combinar ou A partir de R$ 50"/></div>
       <div><label class="flabel">Categoria *</label><select class="fsel" id="adCat"></select></div>
     </div>
-    <label class="flabel">WhatsApp do vendedor *</label><input class="finput" type="tel" id="adWpp" placeholder="5597999999999"/>
+    <label class="flabel">WhatsApp do vendedor *</label>
+    <input class="finput" type="tel" id="adWpp" placeholder="5597999999999 (principal)"/>
+    <label class="flabel">WhatsApp 2 (opcional)</label>
+    <input class="finput" type="tel" id="adWpp2" placeholder="5597888888888 (opcional)"/>
     <label class="flabel">Bairro / Localização</label><input class="finput" type="text" id="adLocal" placeholder="Ex: Centro, Tefé-AM"/>
     <label class="flabel">Descrição</label><textarea class="ftxt" id="adDesc" placeholder="Estado, cor, observações sobre o produto..."></textarea>
     <label class="flabel">Especificações / Detalhes do serviço</label>
@@ -643,6 +673,11 @@ function abrirAdmin(){
   document.getElementById('cfgNome').value=SITE_NOME;
   document.getElementById('cfgCidade').value=SITE_CIDADE;
   document.getElementById('cfgCor').value=SITE_COR;
+  var wm=document.getElementById('cfgWppMsg');if(wm)wm.value=cfg.wpp_btn_msg||'';
+  // Stats
+  var sa=document.getElementById('cfgStatAds');if(sa)sa.textContent=ads.length;
+  var sc=document.getElementById('cfgStatCats');if(sc)sc.textContent=cats.length;
+  var sb=document.getElementById('cfgStatBans');if(sb)sb.textContent=banners.length;
   renderAdList();renderBanList();renderCatList();
 }
 function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');}
@@ -783,6 +818,13 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
     document.getElementById('prodPag').innerHTML=(a.pagamento&&a.pagamento.length)?a.pagamento.map(function(p){return '<span class="pag-chip">'+p+'</span>';}).join(''):'';
     // WPP
     document.getElementById('prodWpp').href='https://wa.me/'+a.whatsapp+'?text='+wppMsg(a);
+    var wpp2El=document.getElementById('prodWpp2');
+    if(a.whatsapp2&&a.whatsapp2.trim()){
+      wpp2El.href='https://wa.me/'+a.whatsapp2+'?text='+wppMsg(a);
+      wpp2El.style.display='flex';
+    } else {
+      wpp2El.style.display='none';
+    }
     // Details
     var dets='<div class="det-item"><div class="det-label">Categoria</div><div class="det-val">'+a.categoria+'</div></div>';
     dets+='<div class="det-item"><div class="det-label">Local</div><div class="det-val">'+(a.local||'Tefé, AM')+'</div></div>';
@@ -844,7 +886,8 @@ function showHome(){document.getElementById('homePage').style.display='';documen
 function renderAdList(){document.getElementById('adCnt').textContent=ads.length;var l=document.getElementById('adminAdList');if(!ads.length){l.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Nenhum anúncio.</div>';return;}l.innerHTML=ads.map(function(a){var th=(a.fotos&&a.fotos[0])?'<img src="'+a.fotos[0]+'" style="width:100%;height:100%;object-fit:cover;"/>':a.emoji||'🏷️';return '<div class="ad-item"><div class="ad-thumb2">'+th+'</div><div class="ad-info"><div class="ad-info-title">'+a.titulo+'</div><div class="ad-info-sub">R$ '+a.preco+' · '+a.categoria+(a.destaque?' · ⭐':'')+'</div></div><div class="ad-btns"><button class="bedit" onclick="abrirFormAd('+a.id+')">✏️</button><button class="bdel" onclick="delAd('+a.id+')">✕</button></div></div>';}).join('');}
 
 // ===== AD FORM =====
-function abrirFormAd(id){var a=id?ads.find(function(x){return x.id===id;}):null;document.getElementById('adFormTitle').textContent=a?'Editar anúncio':'Novo anúncio';document.getElementById('adId').value=a?a.id:'';document.getElementById('adTitulo').value=a?a.titulo:'';document.getElementById('adPreco').value=a?a.preco:'';document.getElementById('adWpp').value=a?a.whatsapp:'';document.getElementById('adLocal').value=a?a.local||'':'';document.getElementById('adDesc').value=a?a.descricao||'':'';document.getElementById('adDest').checked=a?a.destaque:false;selPag=a?[...(a.pagamento||[])]:[];selEmoji=a?a.emoji||'🏷️':'🏷️';document.getElementById('adEmoji').value=selEmoji;
+function abrirFormAd(id){var a=id?ads.find(function(x){return x.id===id;}):null;document.getElementById('adFormTitle').textContent=a?'Editar anúncio':'Novo anúncio';document.getElementById('adId').value=a?a.id:'';document.getElementById('adTitulo').value=a?a.titulo:'';document.getElementById('adPreco').value=a?a.preco:'';document.getElementById('adWpp').value=a?a.whatsapp:'';
+document.getElementById('adWpp2').value=a?a.whatsapp2||'':'';document.getElementById('adLocal').value=a?a.local||'':'';document.getElementById('adDesc').value=a?a.descricao||'':'';document.getElementById('adDest').checked=a?a.destaque:false;selPag=a?[...(a.pagamento||[])]:[];selEmoji=a?a.emoji||'🏷️':'🏷️';document.getElementById('adEmoji').value=selEmoji;
 document.getElementById('adSpecs').value=a?a.specs||'':'';
 document.getElementById('adDisp').value=a?a.disponibilidade||'':'';editImgs=a&&a.fotos?[...a.fotos]:[];editImgsFiles=[];renderImgGallery();var cs=document.getElementById('adCat');cs.innerHTML=cats.map(function(c){return '<option value="'+c.nome+'" '+(a&&a.categoria===c.nome?'selected':'')+'>'+c.emoji+' '+c.nome+'</option>';}).join('');document.getElementById('pagOpts').innerHTML=PAGTOS.map(function(p){return '<div class="popt '+(selPag.includes(p)?'on':'')+'" onclick="togPag(this,\''+p+'\')">'+p+'</div>';}).join('');document.getElementById('emjGrid').innerHTML=EMOJIS.map(function(e){return '<button class="emj-btn '+(selEmoji===e?'on':'')+'" onclick="pickEmj(\''+e+'\')">'+e+'</button>';}).join('');fecharAdmin();document.getElementById('adFormOv').classList.add('on');}
 function togPag(el,p){el.classList.toggle('on');if(selPag.includes(p))selPag=selPag.filter(function(x){return x!==p;});else selPag.push(p);}
@@ -853,9 +896,10 @@ function renderImgGallery(){var g=document.getElementById('imgGallery');if(!edit
 function handleImgs(inp){var files=Array.from(inp.files);files.slice(0,10-editImgs.length).forEach(function(f){editImgsFiles.push(f);var r=new FileReader();r.onload=function(e){editImgs.push(e.target.result);renderImgGallery();};r.readAsDataURL(f);});inp.value='';}
 function delImg(i){editImgs.splice(i,1);editImgsFiles.splice(i,1);renderImgGallery();}
 function mkMain(i){var img=editImgs.splice(i,1)[0];editImgs.unshift(img);var f=editImgsFiles.splice(i,1)[0];if(f)editImgsFiles.unshift(f);renderImgGallery();}
-async function salvarAd(){var t=document.getElementById('adTitulo').value.trim();var p=document.getElementById('adPreco').value.trim();var w=document.getElementById('adWpp').value.trim().replace(/\D/g,'');var cat=document.getElementById('adCat').value;var loc=document.getElementById('adLocal').value.trim();var desc=document.getElementById('adDesc').value.trim();
+async function salvarAd(){var t=document.getElementById('adTitulo').value.trim();var p=document.getElementById('adPreco').value.trim();var w=document.getElementById('adWpp').value.trim().replace(/\D/g,'');
+var w2=document.getElementById('adWpp2').value.trim().replace(/\D/g,'');var cat=document.getElementById('adCat').value;var loc=document.getElementById('adLocal').value.trim();var desc=document.getElementById('adDesc').value.trim();
 var specs=document.getElementById('adSpecs').value.trim();
-var disp=document.getElementById('adDisp').value.trim();var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,whatsapp:w,local:loc,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
+var disp=document.getElementById('adDisp').value.trim();var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,whatsapp:w,whatsapp2:w2,local:loc,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
 async function delAd(id){confirm2('🗑️','Excluir anúncio?','Será removido permanentemente.','Excluir','#e33',async function(){sync(true);try{await sbDel('anuncios',id);ads=ads.filter(function(a){return a.id!==id;});renderAds();renderCatsGrid();renderAdList();toast('Excluído!','🗑️');}catch(e){toast('Erro!','❌');}sync(false);});}
 function fecharFormAd(){document.getElementById('adFormOv').classList.remove('on');abrirAdmin();}
 document.getElementById('adFormOv').addEventListener('click',function(e){if(e.target===this)fecharFormAd();});
