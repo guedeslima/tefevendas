@@ -572,7 +572,7 @@ async function uploadFoto(file){var p=Date.now()+Math.random().toString(36).slic
 // ===== STATE =====
 var cats=[],ads=[],banners=[],cfg={};
 var activeCat='Todos',selPag=[],selEmoji='🏷️',editImgs=[],editImgsFiles=[],banImgData='';
-var PIN='202600',MEU_WPP='5597999999999',PRECO='R$ 10',SITE_NOME='TeféVendas',SITE_CIDADE='Tefé, AM',SITE_COR='#d4300a';
+var PIN='123456',MEU_WPP='5597999999999',PRECO='R$ 10',SITE_NOME='TeféVendas',SITE_CIDADE='Tefé, AM',SITE_COR='#d4300a';
 var WPP_MSG='Olá! Vi o anúncio *"{titulo}"* no {site} e tenho interesse! 😊\n\n💰 Valor: R$ {preco}\n📍 {local}\n💳 Pagamento: {pagamento}\n\nAinda está disponível?';
 var EMOJIS=['📱','💻','🖥️','📷','🎮','📺','🎧','🔌','🛋️','🛏️','🪑','🚪','🏡','🚗','🏍️','🚲','⛵','🔧','🛠️','🎣','🌾','🐄','🐔','👕','👗','👟','👜','💍','📚','🧸','🍳','🧊','🌡️','🔑','🏋️','⚽','🎸','🎨','🌺','🐕','🐈'];
 var PAGTOS=['Pix','Dinheiro','Cartão','Parcelado','À vista','Cheque'];
@@ -613,11 +613,12 @@ function ptback(){pbuf=pbuf.slice(0,-1);updPontos();}
 function ptclear(){pbuf='';updPontos();}
 function updPontos(){for(var i=0;i<6;i++)document.getElementById('pp'+i).classList.toggle('on',i<pbuf.length);}
 function checkPin(){
+  console.log('PIN digitado:', pbuf, '| PIN esperado:', PIN);
   if(pbuf===PIN){
     fecharPin();
     abrirAdmin();
   } else {
-    document.getElementById('pinErro').textContent='Senha incorreta! Tente novamente.';
+    document.getElementById('pinErro').textContent='Incorreta! Digitou: '+pbuf+' Esperado: '+PIN;
     pbuf='';updPontos();
   }
 }
