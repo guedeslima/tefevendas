@@ -128,7 +128,9 @@ main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 .breadcrumb a{color:var(--red);cursor:pointer;}
 .prod-grid{display:grid;grid-template-columns:1fr 360px;gap:24px;}
 .gallery-main{width:100%;aspect-ratio:4/3;background:#f5f0ee;border-radius:var(--radius);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;margin-bottom:10px;}
-.gallery-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+.gallery-main img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:none;}
+.gallery-main img.on{display:block;}
+.gallery-main img{width:100%;height:100%;object-fit:cover;display:none;position:absolute;top:0;left:0;}
 .gallery-main img.on{display:block;}
 .g-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);color:#fff;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
 .g-nav.p{left:10px;}.g-nav.n{right:10px;}
@@ -781,11 +783,18 @@ function showProduct(a){
     emj.textContent=a.emoji||'🏷️';
     gt.innerHTML='';
     if(galleryFotos.length){
+      // Add images in correct order using appendChild (not insertBefore)
       galleryFotos.forEach(function(src,i){
-        var img=document.createElement('img');img.src=src;img.className=i===0?'on':'';
-        gm.insertBefore(img,gm.firstChild);
-        var th=document.createElement('div');th.className='g-thumb'+(i===0?' on':'');
-        var ti=document.createElement('img');ti.src=src;th.appendChild(ti);
+        var img=document.createElement('img');
+        img.src=src;
+        img.alt='Foto '+(i+1);
+        if(i===0) img.classList.add('on');
+        gm.appendChild(img);
+        // Thumbnail
+        var th=document.createElement('div');
+        th.className='g-thumb'+(i===0?' on':'');
+        var ti=document.createElement('img');ti.src=src;
+        th.appendChild(ti);
         th.onclick=(function(idx){return function(){setGallery(idx);};})(i);
         gt.appendChild(th);
       });
@@ -798,8 +807,20 @@ function showProduct(a){
     window.scrollTo({top:0,behavior:'smooth'});
   }catch(err){console.error('showProduct error:',err);}
 }
-function setGallery(i){var imgs=document.getElementById('galleryMain').querySelectorAll('img');var ths=document.getElementById('gThumbs').querySelectorAll('.g-thumb');imgs.forEach(function(x,ii){x.classList.toggle('on',ii===i);});ths.forEach(function(x,ii){x.classList.toggle('on',ii===i);});galIdx=i;}
-function moveGallery(d){setGallery((galIdx+d+galleryFotos.length)%galleryFotos.length);}
+function setGallery(i){
+  var imgs=Array.from(document.getElementById('galleryMain').querySelectorAll('img'));
+  var ths=document.getElementById('gThumbs').querySelectorAll('.g-thumb');
+  imgs.forEach(function(x,ii){x.classList.toggle('on',ii===i);});
+  ths.forEach(function(x,ii){x.classList.toggle('on',ii===i);});
+  galIdx=i;
+  // Scroll thumbnail into view
+  if(ths[i]) ths[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+function moveGallery(d){
+  var total=galleryFotos.length;
+  if(!total) return;
+  setGallery((galIdx+d+total)%total);
+}
 function shareAd(){if(navigator.share)navigator.share({title:document.getElementById('prodTitle').textContent,url:window.location.href});else{navigator.clipboard.writeText(window.location.href);toast('Link copiado!','🔗');}}
 function showHome(){document.getElementById('homePage').style.display='';document.getElementById('productPage').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
 
