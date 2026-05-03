@@ -914,7 +914,61 @@ function fecharFormBan(){document.getElementById('banFormOv').classList.remove('
 document.getElementById('banFormOv').addEventListener('click',function(e){if(e.target===this)fecharFormBan();});
 
 // ===== CATEGORIAS =====
-function renderCatList(){var l=document.getElementById('catEditList');l.innerHTML='';cats.forEach(function(c,i){var row=document.createElement('div');row.className='cat-row';row.innerHTML='<input class="cat-emj" type="text" value="'+c.emoji+'" maxlength="4" id="ce_e_'+i+'"/><input class="cat-nm" type="text" value="'+c.nome+'" id="ce_n_'+i+'"/><button class="csave" onclick="salvarCat('+i+')">✔</button><button class="cdel" onclick="delCat('+c.id+',\''+c.nome+'\')">✕</button>';l.appendChild(row);});}
+function renderCatList(){
+  var l=document.getElementById('catEditList');
+  l.innerHTML='';
+  cats.forEach(function(c,i){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;padding:10px;align-items:center;background:#f8f8f8;border-radius:8px;margin-bottom:8px;';
+    // Thumb
+    var thumb=document.createElement('div');
+    thumb.id='cat_thumb_'+i;
+    thumb.style.cssText='width:50px;height:50px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid #ddd;';
+    thumb.innerHTML=c.imagem?'<img src="'+c.imagem+'" style="width:100%;height:100%;object-fit:cover;"/>':( c.emoji||'🏷️');
+    row.appendChild(thumb);
+    // File input
+    var fi=document.createElement('input');
+    fi.type='file';fi.accept='image/*';fi.style.display='none';
+    fi.onchange=(function(idx2,th){return function(){
+      var f=this.files[0];if(!f)return;
+      cats[idx2]._newImg=f;
+      var r=new FileReader();
+      r.onload=function(e){th.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover;"/>';};
+      r.readAsDataURL(f);
+    };})(i,thumb);
+    row.appendChild(fi);
+    // Photo button
+    var pb=document.createElement('button');
+    pb.style.cssText='background:#fff;border:1.5px solid #ddd;border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;flex-shrink:0;';
+    pb.textContent='📷 Foto';
+    pb.onclick=(function(inp){return function(){inp.click();};})(fi);
+    row.appendChild(pb);
+    // Emoji
+    var ei=document.createElement('input');
+    ei.type='text';ei.value=c.emoji||'';ei.maxLength=4;ei.id='ce_e_'+i;ei.placeholder='🏷️';
+    ei.style.cssText='width:48px;text-align:center;font-size:18px;border:1.5px solid #ddd;border-radius:6px;padding:6px;outline:none;';
+    row.appendChild(ei);
+    // Name
+    var ni=document.createElement('input');
+    ni.type='text';ni.value=c.nome;ni.id='ce_n_'+i;
+    ni.style.cssText='flex:1;min-width:100px;border:1.5px solid #ddd;border-radius:6px;padding:8px 10px;font-size:13px;outline:none;';
+    row.appendChild(ni);
+    // Save
+    var sv=document.createElement('button');
+    sv.style.cssText='background:var(--red);color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600;';
+    sv.textContent='✔';
+    sv.onclick=(function(idx2){return function(){salvarCat(idx2);};})(i);
+    row.appendChild(sv);
+    // Del
+    var dl=document.createElement('button');
+    dl.style.cssText='background:#fff0ef;border:1px solid #fcc;border-radius:6px;padding:8px 10px;font-size:12px;cursor:pointer;color:var(--red);';
+    dl.textContent='✕';
+    dl.onclick=(function(id2,nome2){return function(){delCat(id2,nome2);};})(c.id,c.nome);
+    row.appendChild(dl);
+    l.appendChild(row);
+  });
+}
+
 async function salvarCat(i){
   var e=document.getElementById('ce_e_'+i).value.trim()||'🏷️';
   var n=document.getElementById('ce_n_'+i).value.trim();
