@@ -1520,6 +1520,7 @@ async function init(){
   try{banners=await sbGet('banners','select=*&ativo=eq.true&order=ordem.asc');}catch(e){console.warn('Banners:',e);}
   renderCarousel();renderTopNav();renderCatsGrid();renderAds();
   document.getElementById('loadingScreen').style.display='none';
+  initNotifPopup();
 }
 init();
 </script>
