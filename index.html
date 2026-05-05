@@ -1309,36 +1309,26 @@ function updateVersText(){
 // ===== VISITAS (Supabase) =====
 async function initVisitas(){
   try{
-    var hoje=new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    // Get current counts
+    var hoje=new Date().toISOString().split('T')[0];
+    // Read current values
     var rows=await sbGet('config','select=chave,valor&chave=in.(visitas_hoje,visitas_total,visitas_dia)');
     var data={};
     rows.forEach(function(r){data[r.chave]=r.valor;});
     var ultimoDia=data['visitas_dia']||'';
-    var total=parseInt(data['visitas_total']||'0');
-    var hojeCount=parseInt(data['visitas_hoje']||'0');
-    // Reset daily count if new day
-    if(ultimoDia!==hoje){
-      hojeCount=0;
-    }
-    hojeCount++;total++;
-    // Update in Supabase
-    await Promise.all([
-      fetch(SB+'/rest/v1/config?chave=eq.visitas_total',{method:'PATCH',headers:HW,body:JSON.stringify({valor:String(total)})}),
-      fetch(SB+'/rest/v1/config?chave=eq.visitas_hoje',{method:'PATCH',headers:HW,body:JSON.stringify({valor:String(hojeCount)})}),
-      fetch(SB+'/rest/v1/config?chave=eq.visitas_dia',{method:'PATCH',headers:HW,body:JSON.stringify({valor:hoje})})
-    ]);
+    var total=parseInt(data['visitas_total']||'0')+1;
+    var hojeCount=(ultimoDia===hoje?parseInt(data['visitas_hoje']||'0'):0)+1;
+    // Upsert each value
+    var upsertHeaders={'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
+    await fetch(SB+'/rest/v1/config',{method:'POST',headers:upsertHeaders,body:JSON.stringify({chave:'visitas_total',valor:String(total)})});
+    await fetch(SB+'/rest/v1/config',{method:'POST',headers:upsertHeaders,body:JSON.stringify({chave:'visitas_hoje',valor:String(hojeCount)})});
+    await fetch(SB+'/rest/v1/config',{method:'POST',headers:upsertHeaders,body:JSON.stringify({chave:'visitas_dia',valor:hoje})});
     // Show
     var el1=document.getElementById('visitCount');
     var el2=document.getElementById('visitTotal');
     if(el1) el1.textContent=hojeCount.toLocaleString('pt-BR');
     if(el2) el2.textContent=total.toLocaleString('pt-BR');
   }catch(e){
-    console.warn('Visitas error:',e);
-    var el1=document.getElementById('visitCount');
-    var el2=document.getElementById('visitTotal');
-    if(el1) el1.textContent='—';
-    if(el2) el2.textContent='—';
+    console.warn('Visitas:',e);
   }
 }
 
