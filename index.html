@@ -160,6 +160,10 @@ main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 .safety-box{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;margin-top:14px;font-size:12px;color:#666;line-height:1.6;}
 
 /* FOOTER */
+.adot{display:inline-block;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .2s;border:1px solid rgba(255,255,255,.15);}
+.adot:hover{background:rgba(255,255,255,.5);}
+.adot.hit{background:#fff;transform:scale(1.3);}
+.adot.err{background:#e33;}
 footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:20px;font-size:12px;}
 
 /* TOAST */
@@ -374,7 +378,14 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 
   <footer>
     © 2025 <span id="footerName">TeféVendas</span> — <span id="footerCity">Tefé, AM</span>
-&nbsp;&nbsp;<span onclick="abrirPin()" style="cursor:default;color:transparent;font-size:1px;user-select:none;padding:10px;"> . </span>
+<br/><br/>
+  <span style="display:inline-flex;gap:16px;align-items:center;justify-content:center;">
+    <span class="adot" id="ad0" onclick="dotClick(0)"></span>
+    <span class="adot" id="ad1" onclick="dotClick(1)"></span>
+    <span class="adot" id="ad2" onclick="dotClick(2)"></span>
+    <span class="adot" id="ad3" onclick="dotClick(3)"></span>
+    <span class="adot" id="ad4" onclick="dotClick(4)"></span>
+  </span>
   </footer>
 </div>
 
@@ -687,6 +698,32 @@ function abrirAdmin(){
 }
 function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');}
 // Admin panel does not close on outside click
+
+// ===== SECRET DOTS TRIGGER =====
+// Sequência: clique nos pontos na ordem 1→3→5→2→4
+var DOT_SEQ=[0,2,4,1,3], dotBuf=[], dotTimer=null;
+function dotClick(n){
+  clearTimeout(dotTimer);
+  var el=document.getElementById('ad'+n);
+  el.classList.add('hit');
+  setTimeout(function(){el.classList.remove('hit');},400);
+  dotBuf.push(n);
+  if(dotBuf.length>DOT_SEQ.length) dotBuf=dotBuf.slice(-DOT_SEQ.length);
+  if(dotBuf.length===DOT_SEQ.length && dotBuf.every(function(v,i){return v===DOT_SEQ[i];})){
+    dotBuf=[];
+    abrirPin();
+    return;
+  }
+  // Wrong - flash red after 3s timeout
+  dotTimer=setTimeout(function(){
+    dotBuf=[];
+    [0,1,2,3,4].forEach(function(i){
+      var e=document.getElementById('ad'+i);
+      e.classList.add('err');
+      setTimeout(function(){e.classList.remove('err');},500);
+    });
+  },3000);
+}
 function showTab(id,el){document.querySelectorAll('.tcont').forEach(function(t){t.classList.remove('on');});document.querySelectorAll('.atab').forEach(function(t){t.classList.remove('on');});document.getElementById(id).classList.add('on');el.classList.add('on');}
 
 // ===== CAROUSEL =====
