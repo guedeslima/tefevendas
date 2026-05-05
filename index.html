@@ -197,14 +197,14 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 .mred{width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:11px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;}
 
 /* ADMIN PANEL */
-#adminPanel{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:16px;}
-#adminPanel.on{display:flex;}
-.apanel{background:#fff;border-radius:var(--radius);width:100%;max-width:880px;max-height:95vh;overflow-y:auto;}
-.apanel-head{background:#1a0a06;padding:15px 20px;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;justify-content:space-between;}
+#adminPanel{display:none;position:fixed;inset:0;background:#f2f2f2;z-index:9999;overflow-y:auto;}
+#adminPanel.on{display:block;}
+.apanel{background:#fff;width:100%;min-height:100vh;max-width:100%;border-radius:0;}
+.apanel-head{background:#1a0a06;padding:15px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
 .apanel-head h3{font-family:'Sora',sans-serif;color:#fff;font-size:15px;font-weight:700;}
 .close-x{background:none;border:none;color:rgba(255,255,255,.5);font-size:24px;cursor:pointer;line-height:1;}
-.apanel-body{padding:18px;}
-.atabs{display:flex;gap:4px;background:#f2f2f2;border-radius:var(--rsm);padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.apanel-body{padding:24px;max-width:1000px;margin:0 auto;}
+.atabs{display:flex;gap:4px;background:#f2f2f2;border-radius:var(--rsm);padding:4px;margin-bottom:18px;flex-wrap:wrap;position:sticky;top:58px;z-index:9;}
 .atab{flex:1;border:none;background:none;border-radius:5px;padding:8px;font-size:12px;font-family:'Sora',sans-serif;font-weight:600;cursor:pointer;color:var(--muted);white-space:nowrap;}
 .atab.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
 .tcont{display:none;}.tcont.on{display:block;}
@@ -374,7 +374,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 
   <footer>
     © 2025 <span id="footerName">TeféVendas</span> — <span id="footerCity">Tefé, AM</span>
-    &nbsp;&nbsp;<span onclick="abrirPin()" style="cursor:pointer;color:rgba(255,255,255,.15);font-size:11px;border:1px solid rgba(255,255,255,.1);padding:2px 8px;border-radius:10px;">admin</span>
+&nbsp;&nbsp;<span onclick="abrirPin()" style="cursor:default;color:transparent;font-size:1px;user-select:none;padding:10px;"> . </span>
   </footer>
 </div>
 
@@ -450,7 +450,10 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
   <div class="apanel">
     <div class="apanel-head">
       <h3>⚙ Painel Admin — <span id="adminNome">TeféVendas</span></h3>
-      <button class="close-x" onclick="fecharAdmin()">×</button>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="fecharAdmin()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px;">← Voltar ao site</button>
+        <button class="close-x" onclick="fecharAdmin()">×</button>
+      </div>
     </div>
     <div class="apanel-body">
       <div class="atabs">
@@ -683,7 +686,7 @@ function abrirAdmin(){
   renderAdList();renderBanList();renderCatList();
 }
 function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');}
-document.getElementById('adminPanel').addEventListener('click',function(e){if(e.target===this)fecharAdmin();});
+// Admin panel does not close on outside click
 function showTab(id,el){document.querySelectorAll('.tcont').forEach(function(t){t.classList.remove('on');});document.querySelectorAll('.atab').forEach(function(t){t.classList.remove('on');});document.getElementById(id).classList.add('on');el.classList.add('on');}
 
 // ===== CAROUSEL =====
