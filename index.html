@@ -775,8 +775,6 @@ function renderCarousel(){
   }).join('');
   dots.innerHTML=active.map(function(_,i){return '<button class="cdot '+(i===0?'on':'')+'" onclick="goCar('+i+')"></button>';}).join('');
   cIdx=0;updCar();startCarAuto();
-  // Add bible verse slide
-  addVersSlide();
   startVersTimer();
 }
 function updCar(){document.getElementById('cTrack').style.transform='translateX(-'+cIdx*100+'%)';document.querySelectorAll('.cdot').forEach(function(d,i){d.classList.toggle('on',i===cIdx);});}
