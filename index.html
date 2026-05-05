@@ -559,12 +559,24 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
     <label class="flabel">Título *</label><input class="finput" type="text" id="adTitulo" placeholder="Ex: iPhone 14 128GB"/>
     <div class="row2">
       <div><label class="flabel">Preço *</label><input class="finput" type="text" id="adPreco" placeholder="Ex: 1.200,00 ou A combinar ou A partir de R$ 50"/></div>
-      <div><label class="flabel">Categoria *</label><select class="fsel" id="adCat"></select></div>
+      <div><label class="flabel">Categoria *</label><select class="fsel" id="adCat" onchange="toggleSubcat(this.value)"></select></div>
     </div>
     <label class="flabel">WhatsApp do vendedor *</label>
     <input class="finput" type="tel" id="adWpp" placeholder="5597999999999 (principal)"/>
     <label class="flabel">WhatsApp 2 (opcional)</label>
     <input class="finput" type="tel" id="adWpp2" placeholder="5597888888888 (opcional)"/>
+    <div id="subcatRow" style="display:none;">
+      <label class="flabel">Tipo de serviço</label>
+      <select class="fsel" id="adSubcat">
+        <option value="">Selecione o tipo...</option>
+        <option>Barbearias</option><option>Oficinas Mecânicas</option><option>Borracharias</option>
+        <option>Salões de Beleza</option><option>Advocacia</option><option>Odontologia</option>
+        <option>Elétrica</option><option>Hidráulica</option><option>Construção</option>
+        <option>Pintura</option><option>Roçagem</option><option>Fretes</option>
+        <option>Aulas Particulares</option><option>Informática</option><option>Contabilidade</option>
+        <option>Fotografia</option><option>Outros Serviços</option>
+      </select>
+    </div>
     <label class="flabel">Bairro / Localização</label><input class="finput" type="text" id="adLocal" placeholder="Ex: Centro, Tefé-AM"/>
     <label class="flabel">Descrição</label><textarea class="ftxt" id="adDesc" placeholder="Estado, cor, observações sobre o produto..."></textarea>
     <label class="flabel">Especificações / Detalhes do serviço</label>
@@ -744,6 +756,9 @@ function renderCarousel(){
   }).join('');
   dots.innerHTML=active.map(function(_,i){return '<button class="cdot '+(i===0?'on':'')+'" onclick="goCar('+i+')"></button>';}).join('');
   cIdx=0;updCar();startCarAuto();
+  // Add bible verse slide
+  addVersSlide();
+  startVersTimer();
 }
 function updCar(){document.getElementById('cTrack').style.transform='translateX(-'+cIdx*100+'%)';document.querySelectorAll('.cdot').forEach(function(d,i){d.classList.toggle('on',i===cIdx);});}
 function cMov(d){var a=banners.filter(function(b){return b.ativo;});cIdx=(cIdx+d+a.length)%a.length;updCar();restartAuto();}
@@ -809,6 +824,30 @@ function renderCatsGrid(){
 }
 
 // ===== SEL CAT =====
+// ===== SUBCATEGORIAS DE SERVIÇOS =====
+var SUBCATS = {
+  'Serviços': [
+    {nome:'Barbearias',emoji:'💈'},
+    {nome:'Oficinas Mecânicas',emoji:'🔧'},
+    {nome:'Borracharias',emoji:'🛞'},
+    {nome:'Salões de Beleza',emoji:'💄'},
+    {nome:'Advocacia',emoji:'⚖️'},
+    {nome:'Odontologia',emoji:'🦷'},
+    {nome:'Elétrica',emoji:'⚡'},
+    {nome:'Hidráulica',emoji:'🚿'},
+    {nome:'Construção',emoji:'🏗️'},
+    {nome:'Pintura',emoji:'🖌️'},
+    {nome:'Roçagem',emoji:'🌿'},
+    {nome:'Fretes',emoji:'🚚'},
+    {nome:'Aulas Particulares',emoji:'📚'},
+    {nome:'Informática',emoji:'💻'},
+    {nome:'Contabilidade',emoji:'📊'},
+    {nome:'Fotografia',emoji:'📷'},
+    {nome:'Outros Serviços',emoji:'🛠️'}
+  ]
+};
+var subCatAtivo=null;
+
 function selCat(cat){activeCat=cat;renderTopNav();renderCatsGrid();renderAds();if(cat==='Todos'){document.getElementById('homeView').style.display='';document.getElementById('mainHdr').style.display='none';}else{document.getElementById('homeView').style.display='none';document.getElementById('mainHdr').style.display='flex';document.getElementById('mainTitle').textContent=cat;}window.scrollTo({top:0,behavior:'smooth'});}
 
 // ===== RENDER ADS =====
@@ -948,7 +987,14 @@ function renderAdList(){document.getElementById('adCnt').textContent=ads.length;
 function abrirFormAd(id){var a=id?ads.find(function(x){return x.id===id;}):null;document.getElementById('adFormTitle').textContent=a?'Editar anúncio':'Novo anúncio';document.getElementById('adId').value=a?a.id:'';document.getElementById('adTitulo').value=a?a.titulo:'';document.getElementById('adPreco').value=a?a.preco:'';document.getElementById('adWpp').value=a?a.whatsapp:'';
 document.getElementById('adWpp2').value=a?a.whatsapp2||'':'';document.getElementById('adLocal').value=a?a.local||'':'';document.getElementById('adDesc').value=a?a.descricao||'':'';document.getElementById('adDest').checked=a?a.destaque:false;selPag=a?[...(a.pagamento||[])]:[];selEmoji=a?a.emoji||'🏷️':'🏷️';document.getElementById('adEmoji').value=selEmoji;
 document.getElementById('adSpecs').value=a?a.specs||'':'';
-document.getElementById('adDisp').value=a?a.disponibilidade||'':'';editImgs=a&&a.fotos?[...a.fotos]:[];editImgsFiles=[];renderImgGallery();var cs=document.getElementById('adCat');cs.innerHTML=cats.map(function(c){return '<option value="'+c.nome+'" '+(a&&a.categoria===c.nome?'selected':'')+'>'+c.emoji+' '+c.nome+'</option>';}).join('');document.getElementById('pagOpts').innerHTML=PAGTOS.map(function(p){return '<div class="popt '+(selPag.includes(p)?'on':'')+'" onclick="togPag(this,\''+p+'\')">'+p+'</div>';}).join('');document.getElementById('emjGrid').innerHTML=EMOJIS.map(function(e){return '<button class="emj-btn '+(selEmoji===e?'on':'')+'" onclick="pickEmj(\''+e+'\')">'+e+'</button>';}).join('');fecharAdmin();document.getElementById('adFormOv').classList.add('on');}
+document.getElementById('adDisp').value=a?a.disponibilidade||'':'';
+  var sc=document.getElementById('adSubcat');
+  if(sc) sc.value=a?a.subcategoria||'':'';
+  toggleSubcat(a?a.categoria:'');editImgs=a&&a.fotos?[...a.fotos]:[];editImgsFiles=[];renderImgGallery();var cs=document.getElementById('adCat');cs.innerHTML=cats.map(function(c){return '<option value="'+c.nome+'" '+(a&&a.categoria===c.nome?'selected':'')+'>'+c.emoji+' '+c.nome+'</option>';}).join('');document.getElementById('pagOpts').innerHTML=PAGTOS.map(function(p){return '<div class="popt '+(selPag.includes(p)?'on':'')+'" onclick="togPag(this,\''+p+'\')">'+p+'</div>';}).join('');document.getElementById('emjGrid').innerHTML=EMOJIS.map(function(e){return '<button class="emj-btn '+(selEmoji===e?'on':'')+'" onclick="pickEmj(\''+e+'\')">'+e+'</button>';}).join('');fecharAdmin();document.getElementById('adFormOv').classList.add('on');}
+function toggleSubcat(val){
+  var row=document.getElementById('subcatRow');
+  if(row) row.style.display=(val==='Serviços')?'block':'none';
+}
 function togPag(el,p){el.classList.toggle('on');if(selPag.includes(p))selPag=selPag.filter(function(x){return x!==p;});else selPag.push(p);}
 function pickEmj(e){selEmoji=e;document.getElementById('adEmoji').value=e;document.querySelectorAll('.emj-btn').forEach(function(b){b.classList.toggle('on',b.textContent===e);});}
 function renderImgGallery(){var g=document.getElementById('imgGallery');if(!editImgs.length){g.innerHTML='';return;}g.innerHTML=editImgs.map(function(s,i){return '<div class="img-wrap"><img src="'+s+'"/>'+(i===0?'<div class="img-main">Capa</div>':'<button class="img-mk" onclick="mkMain('+i+')">Capa</button>')+'<button class="img-del" onclick="delImg('+i+')">✕</button></div>';}).join('');}
@@ -958,7 +1004,8 @@ function mkMain(i){var img=editImgs.splice(i,1)[0];editImgs.unshift(img);var f=e
 async function salvarAd(){var t=document.getElementById('adTitulo').value.trim();var p=document.getElementById('adPreco').value.trim();var w=document.getElementById('adWpp').value.trim().replace(/\D/g,'');
 var w2=document.getElementById('adWpp2').value.trim().replace(/\D/g,'');var cat=document.getElementById('adCat').value;var loc=document.getElementById('adLocal').value.trim();var desc=document.getElementById('adDesc').value.trim();
 var specs=document.getElementById('adSpecs').value.trim();
-var disp=document.getElementById('adDisp').value.trim();var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,whatsapp:w,whatsapp2:w2,local:loc,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
+var disp=document.getElementById('adDisp').value.trim();
+var subcat=document.getElementById('adSubcat')?document.getElementById('adSubcat').value:'';var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,subcategoria:subcat,whatsapp:w,whatsapp2:w2,local:loc,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
 async function delAd(id){confirm2('🗑️','Excluir anúncio?','Será removido permanentemente.','Excluir','#e33',async function(){sync(true);try{await sbDel('anuncios',id);ads=ads.filter(function(a){return a.id!==id;});renderAds();renderCatsGrid();renderAdList();toast('Excluído!','🗑️');}catch(e){toast('Erro!','❌');}sync(false);});}
 function fecharFormAd(){document.getElementById('adFormOv').classList.remove('on');abrirAdmin();}
 document.getElementById('adFormOv').addEventListener('click',function(e){if(e.target===this)fecharFormAd();});
@@ -1067,6 +1114,82 @@ document.getElementById('anunciarOv').addEventListener('click',function(e){if(e.
 window.addEventListener('scroll',function(){var b=document.getElementById('backTop');if(b)b.style.display=window.scrollY>300?'flex':'none';});
 
 // ===== INIT =====
+// ===== VERSÍCULOS DA BÍBLIA =====
+var VERSICULOS = [
+  {texto:"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",ref:"João 3:16"},
+  {texto:"O Senhor é o meu pastor e nada me faltará.",ref:"Salmos 23:1"},
+  {texto:"Tudo posso naquele que me fortalece.",ref:"Filipenses 4:13"},
+  {texto:"Porque sou eu que conheço os planos que tenho para vocês, planos de fazê-los prosperar e não de causar dano, planos de dar a vocês esperança e um futuro.",ref:"Jeremias 29:11"},
+  {texto:"Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.",ref:"Salmos 37:5"},
+  {texto:"Não temas, porque eu sou contigo; não te assombres, porque eu sou teu Deus; eu te fortaleço, e te ajudo, e te sustento com a destra da minha justiça.",ref:"Isaías 41:10"},
+  {texto:"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti.",ref:"Números 6:24-25"},
+  {texto:"Mas os que esperam no Senhor renovarão as suas forças, subirão com asas como águias, correrão e não se cansarão, caminharão e não se fatigarão.",ref:"Isaías 40:31"},
+  {texto:"Aquietai-vos e sabei que eu sou Deus.",ref:"Salmos 46:10"},
+  {texto:"Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos.",ref:"Filipenses 4:4"},
+  {texto:"Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei.",ref:"Mateus 11:28"},
+  {texto:"Porque eu sei os pensamentos que tenho a vosso respeito, diz o Senhor; pensamentos de paz e não de mal.",ref:"Jeremias 29:11"},
+  {texto:"Busca a Deus em primeiro lugar o seu reino e a sua justiça, e todas estas coisas vos serão acrescentadas.",ref:"Mateus 6:33"},
+  {texto:"Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.",ref:"Provérbios 3:5"},
+  {texto:"Sede fortes e corajosos! Não tenhais medo nem terror deles, pois é o Senhor, o teu Deus, que marcha contigo.",ref:"Deuteronômio 31:6"},
+  {texto:"Porque a minha força se aperfeiçoa na fraqueza.",ref:"2 Coríntios 12:9"},
+  {texto:"A paz de Deus, que excede todo o entendimento, guardará os vossos corações e os vossos pensamentos em Cristo Jesus.",ref:"Filipenses 4:7"},
+  {texto:"O amor é paciente, é benigno; o amor não arde em ciúmes, não se vangloria, não se ensoberbece.",ref:"1 Coríntios 13:4"},
+  {texto:"Bendize, ó minha alma, ao Senhor, e tudo o que há em mim bendiga o seu santo nome.",ref:"Salmos 103:1"},
+  {texto:"Esta é a vitória que vence o mundo: a nossa fé.",ref:"1 João 5:4"}
+];
+var versUsados=[], versTimer=null;
+
+function getVersAleat(){
+  if(versUsados.length>=VERSICULOS.length) versUsados=[];
+  var disponiveis=VERSICULOS.filter(function(_,i){return !versUsados.includes(i);});
+  var idx=Math.floor(Math.random()*disponiveis.length);
+  var v=disponiveis[idx];
+  versUsados.push(VERSICULOS.indexOf(v));
+  return v;
+}
+
+function addVersSlide(){
+  // Add bible verse as last slide in carousel
+  var v=getVersAleat();
+  var track=document.getElementById('cTrack');
+  var dots=document.getElementById('cDots');
+  if(!track) return;
+  // Remove old verse slide if exists
+  var old=document.getElementById('versSlidEl');
+  if(old) old.remove();
+  // Create verse slide
+  var slide=document.createElement('div');
+  slide.className='c-slide';
+  slide.id='versSlidEl';
+  slide.style.background='linear-gradient(135deg,#1a0a3e 0%,#2d1a5c 50%,#1a0a2e 100%)';
+  var inner=document.createElement('div');inner.className='c-txt';inner.style.cssText='max-width:700px;text-align:center;margin:0 auto;padding:32px 40px;';
+  var lbl=document.createElement('div');lbl.style.cssText='font-size:14px;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;';lbl.textContent='\u271d Palavra do Dia';inner.appendChild(lbl);
+  var vtxt=document.createElement('div');vtxt.style.cssText='font-size:clamp(16px,2.5vw,22px);font-weight:600;color:#fff;line-height:1.6;font-style:italic;margin-bottom:16px;';vtxt.textContent='\u201c'+v.texto+'\u201d';inner.appendChild(vtxt);
+  var vref=document.createElement('div');vref.style.cssText='font-size:14px;color:rgba(255,255,255,.7);font-weight:600;';vref.textContent='\u2014 '+v.ref;inner.appendChild(vref);
+  slide.appendChild(inner);
+  track.appendChild(slide);
+  // Add dot
+  var dot=document.createElement('button');
+  dot.className='cdot';
+  var dotIdx=dots.children.length;
+  dot.onclick=(function(i){return function(){goCar(i);};})(dotIdx);
+  dots.appendChild(dot);
+}
+
+function startVersTimer(){
+  clearInterval(versTimer);
+  versTimer=setInterval(function(){
+    addVersSlide();
+    // Go to verse slide (last one)
+    var total=document.getElementById('cTrack').children.length;
+    goCar(total-1);
+    // After showing verse for 30s, go back to first slide
+    setTimeout(function(){
+      goCar(0);
+    },30000);
+  },4*60*1000); // every 4 minutes
+}
+
 async function init(){
   try{
     var cfgRows=await sbGet('config','select=chave,valor');
