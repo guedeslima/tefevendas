@@ -761,22 +761,75 @@ function showTab(id,el){document.querySelectorAll('.tcont').forEach(function(t){
 var cIdx=0,cAuto=null;
 function renderCarousel(){
   var active=banners.filter(function(b){return b.ativo;});
-  if(!active.length){document.getElementById('carouselWrap').style.display='none';return;}
   document.getElementById('carouselWrap').style.display='';
   var track=document.getElementById('cTrack');
   var dots=document.getElementById('cDots');
-  track.innerHTML=active.map(function(b){
-    return '<div class="c-slide" style="background:'+(b.bg_cor||'#1a0a06')+';">'
-      +(b.imagem?'<img class="bg" src="'+b.imagem+'"/><div class="c-ov"></div>':'')
-      +'<div class="c-txt">'+(b.tag?'<div class="c-tag" style="background:'+(b.tag_cor||'#d4300a')+'">'+b.tag+'</div>':'')
-      +'<div class="c-title">'+b.titulo+'</div>'+(b.subtitulo?'<div class="c-sub">'+b.subtitulo+'</div>':'')
-      +(b.btn_texto?'<a class="c-btn" style="color:'+(b.tag_cor||'#d4300a')+';" href="'+(b.btn_link||'#')+'" '+(b.btn_link?'target="_blank"':'')+'>'+b.btn_texto+' →</a>':'')
-      +'</div></div>';
-  }).join('');
-  dots.innerHTML=active.map(function(_,i){return '<button class="cdot '+(i===0?'on':'')+'" onclick="goCar('+i+')"></button>';}).join('');
+
+  // Build all slides including verse
+  var v=getVersAleat();
+  var allSlides=[];
+
+  // Banner slides
+  active.forEach(function(b){
+    allSlides.push({type:'banner',data:b});
+  });
+
+  // Verse slide (always included)
+  allSlides.push({type:'verse',data:v});
+
+  // Build track HTML
+  track.innerHTML='';
+  dots.innerHTML='';
+
+  allSlides.forEach(function(s,i){
+    var slide=document.createElement('div');
+    slide.className='c-slide';
+
+    if(s.type==='banner'){
+      var b=s.data;
+      slide.style.background=b.bg_cor||'#1a0a06';
+      if(b.imagem){
+        var img=document.createElement('img');img.className='bg';img.src=b.imagem;slide.appendChild(img);
+        var ov=document.createElement('div');ov.className='c-ov';slide.appendChild(ov);
+      }
+      var txt=document.createElement('div');txt.className='c-txt';
+      if(b.tag){var tag=document.createElement('div');tag.className='c-tag';tag.style.background=b.tag_cor||'#d4300a';tag.textContent=b.tag;txt.appendChild(tag);}
+      var ti=document.createElement('div');ti.className='c-title';ti.textContent=b.titulo;txt.appendChild(ti);
+      if(b.subtitulo){var su=document.createElement('div');su.className='c-sub';su.textContent=b.subtitulo;txt.appendChild(su);}
+      if(b.btn_texto){var btn=document.createElement('a');btn.className='c-btn';btn.style.color=b.tag_cor||'#d4300a';btn.href=b.btn_link||'#';if(b.btn_link)btn.target='_blank';btn.textContent=b.btn_texto+' →';txt.appendChild(btn);}
+      slide.appendChild(txt);
+    } else {
+      // Verse slide
+      slide.id='versSlidEl';
+      slide.style.background='linear-gradient(135deg,#1a0a3e,#2d1a5c,#1a0a2e)';
+      var inner=document.createElement('div');
+      inner.style.cssText='max-width:700px;text-align:center;padding:32px 40px;margin:0 auto;';
+      var lbl=document.createElement('div');
+      lbl.style.cssText='font-size:13px;color:rgba(255,255,255,.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;';
+      lbl.textContent='✝ Palavra do Dia';
+      var vtxt=document.createElement('div');
+      vtxt.className='vtxt';
+      vtxt.style.cssText='font-size:clamp(15px,2.2vw,20px);font-weight:500;color:#fff;line-height:1.7;font-style:italic;margin-bottom:18px;transition:opacity .5s;';
+      vtxt.textContent='“'+s.data.texto+'”';
+      var vref=document.createElement('div');
+      vref.className='vref';
+      vref.style.cssText='font-size:14px;color:rgba(255,255,255,.7);font-weight:700;transition:opacity .5s;';
+      vref.textContent='— '+s.data.ref;
+      inner.appendChild(lbl);inner.appendChild(vtxt);inner.appendChild(vref);
+      slide.appendChild(inner);
+    }
+
+    track.appendChild(slide);
+
+    // Dot
+    var dot=document.createElement('button');
+    dot.className='cdot'+(i===0?' on':'');
+    if(s.type==='verse') dot.style.background='rgba(255,220,150,.6)';
+    dot.onclick=(function(idx){return function(){goCar(idx);};})(i);
+    dots.appendChild(dot);
+  });
+
   cIdx=0;updCar();startCarAuto();
-  // Add permanent verse slide
-  addVersSlide();
   startVersTimer();
 }
 function updCar(){document.getElementById('cTrack').style.transform='translateX(-'+cIdx*100+'%)';document.querySelectorAll('.cdot').forEach(function(d,i){d.classList.toggle('on',i===cIdx);});}
@@ -1181,31 +1234,8 @@ function getVersAleat(){
 }
 
 function addVersSlide(){
-  // Add bible verse as last slide in carousel
-  var v=getVersAleat();
-  var track=document.getElementById('cTrack');
-  var dots=document.getElementById('cDots');
-  if(!track) return;
-  // Remove old verse slide if exists
-  var old=document.getElementById('versSlidEl');
-  if(old) old.remove();
-  // Create verse slide
-  var slide=document.createElement('div');
-  slide.className='c-slide';
-  slide.id='versSlidEl';
-  slide.style.background='linear-gradient(135deg,#1a0a3e 0%,#2d1a5c 50%,#1a0a2e 100%)';
-  var inner=document.createElement('div');inner.className='c-txt';inner.style.cssText='max-width:700px;text-align:center;margin:0 auto;padding:32px 40px;';
-  var lbl=document.createElement('div');lbl.style.cssText='font-size:14px;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;';lbl.textContent='\u271d Palavra do Dia';inner.appendChild(lbl);
-  var vtxt=document.createElement('div');vtxt.style.cssText='font-size:clamp(16px,2.5vw,22px);font-weight:600;color:#fff;line-height:1.6;font-style:italic;margin-bottom:16px;';vtxt.textContent='\u201c'+v.texto+'\u201d';inner.appendChild(vtxt);
-  var vref=document.createElement('div');vref.style.cssText='font-size:14px;color:rgba(255,255,255,.7);font-weight:600;';vref.textContent='\u2014 '+v.ref;inner.appendChild(vref);
-  slide.appendChild(inner);
-  track.appendChild(slide);
-  // Add dot
-  var dot=document.createElement('button');
-  dot.className='cdot';
-  var dotIdx=dots.children.length;
-  dot.onclick=(function(i){return function(){goCar(i);};})(dotIdx);
-  dots.appendChild(dot);
+  // Legacy - just update text if slide exists
+  updateVersText();
 }
 
 function showVersSlide(){
