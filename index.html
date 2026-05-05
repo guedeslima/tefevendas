@@ -1357,6 +1357,7 @@ async function init(){
     if(cfg.wpp_msg)WPP_MSG=cfg.wpp_msg;
   }catch(e){console.warn('Config:',e);}
   aplicarConfig();
+  initVisitas();
   try{cats=await sbGet('categorias','select=*&order=ordem.asc');}catch(e){console.warn('Cats:',e);}
   try{ads=await sbGet('anuncios','select=*&ativo=eq.true&order=destaque.desc,criado_em.desc');}catch(e){console.warn('Ads:',e);}
   try{banners=await sbGet('banners','select=*&ativo=eq.true&order=ordem.asc');}catch(e){console.warn('Banners:',e);}
