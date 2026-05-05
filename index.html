@@ -1206,14 +1206,20 @@ function addVersSlide(){
   dots.appendChild(dot);
 }
 
+function showVersSlide(){
+  var track=document.getElementById('cTrack');
+  if(!track) return;
+  addVersSlide();
+  var total=track.children.length;
+  goCar(total-1);
+  setTimeout(function(){if(cIdx===total-1)goCar(0);},25000);
+}
+
 function startVersTimer(){
   clearInterval(versTimer);
   versTimer=setInterval(function(){
-    addVersSlide();
-    // Go to verse slide (last one)
-    var total=document.getElementById('cTrack').children.length;
-    goCar(total-1);
-    // After showing verse for 30s, go back to first slide
+    showVersSlide();
+    // legacy fallback
     setTimeout(function(){
       goCar(0);
     },30000);
