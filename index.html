@@ -775,6 +775,8 @@ function renderCarousel(){
   }).join('');
   dots.innerHTML=active.map(function(_,i){return '<button class="cdot '+(i===0?'on':'')+'" onclick="goCar('+i+')"></button>';}).join('');
   cIdx=0;updCar();startCarAuto();
+  // Add permanent verse slide
+  addVersSlide();
   startVersTimer();
 }
 function updCar(){document.getElementById('cTrack').style.transform='translateX(-'+cIdx*100+'%)';document.querySelectorAll('.cdot').forEach(function(d,i){d.classList.toggle('on',i===cIdx);});}
@@ -1212,19 +1214,33 @@ function showVersSlide(){
   addVersSlide();
   var total=track.children.length;
   goCar(total-1);
-  setTimeout(function(){if(cIdx===total-1)goCar(0);},25000);
 }
 
 function startVersTimer(){
   clearInterval(versTimer);
+  // Change verse text every 2 minutes (keep slide permanent)
   versTimer=setInterval(function(){
-    showVersSlide();
-    // legacy fallback
-    setTimeout(function(){
-      goCar(0);
-    },30000);
-  },4*60*1000); // every 4 minutes
+    updateVersText();
+  },2*60*1000);
 }
+
+function updateVersText(){
+  var slide=document.getElementById('versSlidEl');
+  if(!slide) return;
+  var v=getVersAleat();
+  var vtxt=slide.querySelector('.vtxt');
+  var vref=slide.querySelector('.vref');
+  if(!vtxt||!vref) return;
+  // Fade out
+  vtxt.style.opacity='0';vref.style.opacity='0';
+  setTimeout(function(){
+    vtxt.textContent='“'+v.texto+'”';
+    vref.textContent='— '+v.ref;
+    // Fade in
+    vtxt.style.opacity='1';vref.style.opacity='1';
+  },500);
+}
+
 
 async function init(){
   try{
