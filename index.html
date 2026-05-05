@@ -178,6 +178,21 @@ main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:20px;font-size:12px;}
 
 /* TOAST */
+/* NOTIFICAÇÃO WPP POPUP */
+#notifPopup{display:none;position:fixed;bottom:24px;left:20px;background:#fff;border-radius:14px;padding:20px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:9998;border:1px solid var(--border);animation:slideUp .4s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+#notifPopup.show{display:block;}
+.notif-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.notif-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;}
+.notif-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;}
+.notif-sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.notif-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:8px;outline:none;}
+.notif-input:focus{border-color:#25d366;}
+.notif-btn{width:100%;background:#25d366;color:#fff;border:none;border-radius:8px;padding:10px;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.notif-skip{width:100%;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;margin-top:8px;padding:4px;}
+/* VIEWS BADGE */
+.views-badge{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px;margin-bottom:8px;}
+
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#222;color:#fff;padding:12px 24px;border-radius:30px;font-size:14px;font-weight:500;z-index:9999;transition:transform .3s,opacity .3s;opacity:0;white-space:nowrap;}
 .toast.on{transform:translateX(-50%) translateY(0);opacity:1;}
 
@@ -445,6 +460,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
           <div class="prod-title" id="prodTitle"></div>
           <div class="prod-price" id="prodPrice"></div>
           <div class="prod-local" id="prodLocal"></div>
+          <div class="views-badge" id="prodViewsBadge"></div>
           <div id="prodDisp" style="display:none;font-size:13px;color:#555;margin-bottom:14px;background:#f8f8f8;padding:8px 12px;border-radius:8px;border-left:3px solid var(--red);"></div>
           <div class="pag-row" id="prodPag"></div>
           <a class="wpp-prod" id="prodWpp" href="#" target="_blank">
@@ -461,6 +477,22 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
       </div>
     </div>
   </div>
+</div>
+
+<!-- NOTIF POPUP -->
+<div id="notifPopup">
+  <div class="notif-header">
+    <div class="notif-title">🔔 Receber notificações</div>
+    <button class="notif-close" onclick="fecharNotif()">×</button>
+  </div>
+  <div class="notif-sub">Cadastre seu WhatsApp e receba avisos de novos anúncios e serviços no <strong id="notifSiteName">TeféVendas</strong>!</div>
+  <input class="notif-input" type="text" id="notifNome" placeholder="Seu nome"/>
+  <input class="notif-input" type="tel" id="notifWpp" placeholder="(97) 9 9999-9999"/>
+  <button class="notif-btn" onclick="cadastrarNotif()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Quero receber notificações!
+  </button>
+  <button class="notif-skip" onclick="fecharNotif()">Agora não</button>
 </div>
 
 <!-- TOAST -->
@@ -502,6 +534,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
     <div class="apanel-body">
       <div class="atabs">
         <button class="atab on" onclick="showTab('tAds',this)">📋 Anúncios</button>
+        <button class="atab" onclick="showTab('tNotif',this)">🔔 Notificações</button>
         <button class="atab" onclick="showTab('tBan',this)">🖼 Carrossel</button>
         <button class="atab" onclick="showTab('tCat',this)">🏷 Categorias</button>
         <button class="atab" onclick="showTab('tCfg',this)">⚙ Config</button>
@@ -513,6 +546,22 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
         <div class="alabel">Anúncios (<span id="adCnt">0</span>)</div>
         <div id="adminAdList"></div>
       </div>
+      <!-- NOTIFICAÇÕES -->
+      <div class="tcont" id="tNotif">
+        <div style="background:#f0fff4;border-radius:8px;padding:14px;margin-bottom:16px;border-left:3px solid #25d366;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px;">📲 Inscritos para notificações</div>
+          <div style="font-size:12px;color:#666;">Total: <strong id="notifCount">0</strong> pessoas cadastradas</div>
+        </div>
+        <div class="alabel">Disparar mensagem em massa</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Ao adicionar um anúncio novo, use isso para notificar todos os inscritos.</p>
+        <textarea class="atxt" id="msgMassa" placeholder="Ex: 🆕 Novo anúncio no TeféVendas! Confira: guedeslima.github.io/tefevendas" style="min-height:80px;"></textarea>
+        <button class="mred" onclick="dispararMassa()" style="margin-bottom:10px;">📤 Gerar links do WhatsApp</button>
+        <div id="massaLinks" style="display:none;max-height:300px;overflow-y:auto;"></div>
+        <div class="adiv"></div>
+        <div class="alabel">Lista de inscritos</div>
+        <div id="notifList"></div>
+      </div>
+
       <!-- BANNERS -->
       <div class="tcont" id="tBan">
         <button class="mred" onclick="abrirFormBan(null)">+ Novo banner</button>
@@ -758,7 +807,7 @@ function abrirAdmin(){
   var sa=document.getElementById('cfgStatAds');if(sa)sa.textContent=ads.length;
   var sc=document.getElementById('cfgStatCats');if(sc)sc.textContent=cats.length;
   var sb=document.getElementById('cfgStatBans');if(sb)sb.textContent=banners.length;
-  renderAdList();renderBanList();renderCatList();
+  renderAdList();renderBanList();renderCatList();renderNotifList();
 }
 function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');}
 // Admin panel does not close on outside click
@@ -1079,6 +1128,11 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
       }
     }
     window.scrollTo({top:0,behavior:'smooth'});
+  // Register view
+  registrarView(a.id).then(function(total){
+    var vb=document.getElementById('prodViewsBadge');
+    if(vb&&total>0) vb.textContent='👁 '+total+' visualização'+(total!==1?'s':'');
+  });
   }catch(err){console.error('showProduct error:',err);}
 }
 function setGallery(i){
@@ -1218,7 +1272,8 @@ async function delCat(id,nome){confirm2('🗂️','Remover categoria?','"'+nome+
 
 // ===== CONFIG =====
 async function salvarAparencia(){sync(true);try{var n=document.getElementById('cfgNome').value.trim();var ci=document.getElementById('cfgCidade').value.trim();var co=document.getElementById('cfgCor').value;if(n){SITE_NOME=n;await sbSaveCfg('site_nome',n);}if(ci){SITE_CIDADE=ci;await sbSaveCfg('site_cidade',ci);}if(co){SITE_COR=co;await sbSaveCfg('site_cor',co);}aplicarConfig();
-  initVisitas();toast('Aparência salva!');}catch(e){toast('Erro!','❌');}sync(false);}
+  initVisitas();
+  initNotifPopup();toast('Aparência salva!');}catch(e){toast('Erro!','❌');}sync(false);}
 async function salvarWpp(){var v=document.getElementById('cfgWpp').value.trim().replace(/\D/g,'');if(!v)return;sync(true);try{MEU_WPP=v;await sbSaveCfg('meu_wpp',v);toast('WhatsApp salvo!');}catch(e){toast('Erro!','❌');}sync(false);}
 async function salvarPreco(){var v=document.getElementById('cfgPreco').value.trim();if(!v)return;sync(true);try{PRECO=v;await sbSaveCfg('preco_anuncio',v);document.getElementById('priceEl').textContent=v;toast('Valor salvo!');}catch(e){toast('Erro!','❌');}sync(false);}
 async function salvarPin(){var p1=document.getElementById('cfgPin1').value;var p2=document.getElementById('cfgPin2').value;if(!/^\d{6}$/.test(p1)){toast('Senha deve ter 6 dígitos!','⚠️');return;}if(p1!==p2){toast('Senhas não coincidem!','⚠️');return;}sync(true);try{PIN=p1;await sbSaveCfg('admin_pin',p1);document.getElementById('cfgPin1').value='';document.getElementById('cfgPin2').value='';toast('Senha alterada!','🔐');}catch(e){toast('Erro!','❌');}sync(false);}
@@ -1228,6 +1283,108 @@ function abrirAnunciar(){document.getElementById('anunciarOv').classList.add('on
 function enviarAnuncio(){var n=document.getElementById('fNome').value.trim();var p=document.getElementById('fProduto').value.trim();var pr=document.getElementById('fPreco').value.trim();var w=document.getElementById('fWpp').value.trim();var i=document.getElementById('fInfo').value.trim();if(!n||!p){toast('Preencha nome e produto!','⚠️');return;}var m='Olá! Quero anunciar no '+SITE_NOME+' 📢\n\n*Nome:* '+n+'\n*Produto:* '+p+'\n*Preço:* '+(pr||'a combinar')+'\n*WhatsApp:* '+(w||'este')+'\n*Info:* '+(i||'—');window.open('https://wa.me/'+MEU_WPP+'?text='+encodeURIComponent(m),'_blank');fecharOv('anunciarOv');}
 function abrirWppMeu(){window.open('https://wa.me/'+MEU_WPP+'?text='+encodeURIComponent('Olá, quero anunciar no '+SITE_NOME+'!'),'_blank');}
 document.getElementById('anunciarOv').addEventListener('click',function(e){if(e.target===this)fecharOv('anunciarOv');});
+
+// ===== NOTIFICAÇÕES =====
+function abrirNotif(){
+  var el=document.getElementById('notifPopup');
+  var nn=document.getElementById('notifSiteName');
+  if(nn) nn.textContent=SITE_NOME;
+  if(el) el.classList.add('show');
+}
+function fecharNotif(){
+  var el=document.getElementById('notifPopup');
+  if(el) el.classList.remove('show');
+  localStorage.setItem('notifFechado','1');
+}
+function initNotifPopup(){
+  // Show popup after 30 seconds if not already registered or closed
+  if(localStorage.getItem('notifCadastrado')||localStorage.getItem('notifFechado')) return;
+  setTimeout(function(){abrirNotif();},30000);
+}
+async function cadastrarNotif(){
+  var nome=document.getElementById('notifNome').value.trim();
+  var wpp=document.getElementById('notifWpp').value.trim().replace(/\D/g,'');
+  if(!nome||!wpp||wpp.length<10){toast('Preencha nome e WhatsApp!','⚠️');return;}
+  if(wpp.length===11) wpp='55'+wpp;
+  try{
+    await sbPost('notificacoes_wpp',{nome:nome,whatsapp:wpp,ativo:true});
+    localStorage.setItem('notifCadastrado','1');
+    fecharNotif();
+    toast('Cadastrado! Você receberá novidades 🎉','🔔');
+  }catch(e){
+    // Might be duplicate
+    if(e.message.includes('duplicate')||e.message.includes('23505')){
+      localStorage.setItem('notifCadastrado','1');
+      fecharNotif();
+      toast('Você já está cadastrado! 😊','✅');
+    } else {
+      toast('Erro ao cadastrar: '+e.message,'❌');
+    }
+  }
+}
+
+// Admin notifications
+async function renderNotifList(){
+  try{
+    var rows=await sbGet('notificacoes_wpp','select=*&order=criado_em.desc');
+    document.getElementById('notifCount').textContent=rows.filter(function(r){return r.ativo;}).length;
+    var list=document.getElementById('notifList');
+    if(!rows.length){list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Nenhum inscrito ainda.</div>';return;}
+    list.innerHTML=rows.map(function(r){
+      var d=new Date(r.criado_em).toLocaleDateString('pt-BR');
+      return '<div style="background:#f8f8f8;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">'
+        +'<div style="font-size:20px;">'+( r.ativo?'🟢':'🔴')+'</div>'
+        +'<div style="flex:1;">'
+        +'<div style="font-size:13px;font-weight:600;">'+r.nome+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);">+'+r.whatsapp+' · '+d+'</div>'
+        +'</div>'
+        +'<a href="https://wa.me/'+r.whatsapp+'" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;text-decoration:none;font-weight:600;">💬</a>'
+        +'<button onclick="removerNotif('+r.id+')" style="background:#fff0ef;border:1px solid #fcc;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;color:var(--red);">✕</button>'
+        +'</div>';
+    }).join('');
+  }catch(e){console.warn('Notif list:',e);}
+}
+async function removerNotif(id){
+  try{
+    await sbDel('notificacoes_wpp',id);
+    toast('Removido!','🗑️');
+    renderNotifList();
+  }catch(e){toast('Erro!','❌');}
+}
+async function dispararMassa(){
+  var msg=document.getElementById('msgMassa').value.trim();
+  if(!msg){toast('Digite a mensagem!','⚠️');return;}
+  try{
+    var rows=await sbGet('notificacoes_wpp','select=whatsapp,nome&ativo=eq.true');
+    if(!rows.length){toast('Nenhum inscrito!','⚠️');return;}
+    var linksEl=document.getElementById('massaLinks');
+    linksEl.style.display='block';
+    linksEl.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Clique em cada link para enviar a mensagem:</div>'
+      +rows.map(function(r){
+        var wppMsg=encodeURIComponent('Olá '+r.nome+'! '+msg);
+        return '<a href="https://wa.me/'+r.whatsapp+'?text='+wppMsg+'" target="_blank" '
+          +'style="display:flex;align-items:center;gap:8px;background:#f0fff4;border:1px solid #c3e6cb;border-radius:8px;padding:8px 12px;margin-bottom:6px;text-decoration:none;color:var(--text);">'
+          +'<span style="font-size:16px;">💬</span>'
+          +'<span style="font-size:13px;font-weight:600;">'+r.nome+'</span>'
+          +'<span style="font-size:11px;color:var(--muted);margin-left:auto;">+'+r.whatsapp+'</span>'
+          +'</a>';
+      }).join('');
+    toast(rows.length+' links gerados!','📤');
+  }catch(e){toast('Erro: '+e.message,'❌');}
+}
+
+// ===== VIEWS POR ANÚNCIO =====
+async function registrarView(adId){
+  try{
+    var r=await fetch(SB+'/rest/v1/rpc/registrar_visualizacao',{
+      method:'POST',
+      headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'},
+      body:JSON.stringify({p_anuncio_id:adId})
+    });
+    if(r.ok) return await r.json();
+  }catch(e){}
+  return 0;
+}
 
 // ===== SCROLL =====
 window.addEventListener('scroll',function(){var b=document.getElementById('backTop');if(b)b.style.display=window.scrollY>300?'flex':'none';});
