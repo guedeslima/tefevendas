@@ -833,7 +833,7 @@ function renderCarousel(){
   startVersTimer();
 }
 function updCar(){document.getElementById('cTrack').style.transform='translateX(-'+cIdx*100+'%)';document.querySelectorAll('.cdot').forEach(function(d,i){d.classList.toggle('on',i===cIdx);});}
-function cMov(d){var a=banners.filter(function(b){return b.ativo;});cIdx=(cIdx+d+a.length)%a.length;updCar();restartAuto();}
+function cMov(d){var total=document.getElementById('cTrack').children.length;cIdx=(cIdx+d+total)%total;updCar();restartAuto();}
 function goCar(i){cIdx=i;updCar();restartAuto();}
 function startCarAuto(){clearInterval(cAuto);cAuto=setInterval(function(){var a=banners.filter(function(b){return b.ativo;});cIdx=(cIdx+1)%a.length;updCar();},4500);}
 function restartAuto(){clearInterval(cAuto);startCarAuto();}
