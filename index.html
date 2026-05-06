@@ -440,7 +440,8 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 <!-- PRODUCT PAGE -->
 <div id="productPage">
   <div class="prod-inner">
-    <div class="breadcrumb"><a onclick="showHome()">🏠 Início</a> › <span id="bcCat"></span> › <span id="bcTitle" style="color:var(--text);font-weight:500;"></span></div>
+    <button onclick="history.back()||showHome()" style="display:inline-flex;align-items:center;gap:6px;background:#f2f2f2;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;font-family:'Sora',sans-serif;">← Voltar</button>
+    <div class="breadcrumb"><a onclick="showHome()" style="color:var(--red);cursor:pointer;">🏠 Início</a> <span style="color:#bbb;margin:0 4px;">›</span> <span id="bcCat"></span> <span style="color:#bbb;margin:0 4px;" id="bcArrow2">›</span> <span id="bcTitle"></span></div>
     <div class="prod-grid">
       <div>
         <div id="galleryWrap" style="display:flex!important;flex-direction:row!important;gap:10px;margin-bottom:16px;align-items:flex-start;width:100%;">
@@ -1038,8 +1039,23 @@ function showProduct(a){
     document.getElementById('homePage').style.display='none';
     document.getElementById('productPage').style.display='block';
     // Breadcrumb
-    document.getElementById('bcCat').textContent=a.categoria||'';
-    document.getElementById('bcTitle').textContent=(a.titulo||'').substring(0,40);
+    // Breadcrumb - clickable
+    var bcCat=document.getElementById('bcCat');
+    var bcTitle=document.getElementById('bcTitle');
+    bcCat.textContent=a.subcategoria||a.categoria||'';
+    bcCat.onclick=function(){
+      showHome();
+      if(a.subcategoria){
+        // Go back to subcategory
+        setTimeout(function(){showSubCats(a.categoria);},100);
+      } else {
+        // Go back to category
+        setTimeout(function(){selCat(a.categoria);},100);
+      }
+    };
+    bcCat.style.cssText='color:var(--red);cursor:pointer;text-decoration:none;';
+    bcTitle.textContent=(a.titulo||'').substring(0,40)+(a.titulo&&a.titulo.length>40?'...':'');
+    bcTitle.style.cssText='color:var(--text);font-weight:500;';
     // Info
     document.getElementById('prodCat').textContent=(a.categoria||'')+(a.local?' · '+a.local:'');
     document.getElementById('prodTitle').textContent=a.titulo||'';
@@ -1155,7 +1171,17 @@ function moveGallery(d){
   setGallery((galIdx+d+galleryFotos.length)%galleryFotos.length);
 }
 function shareAd(){if(navigator.share)navigator.share({title:document.getElementById('prodTitle').textContent,url:window.location.href});else{navigator.clipboard.writeText(window.location.href);toast('Link copiado!','🔗');}}
-function showHome(){document.getElementById('homePage').style.display='';document.getElementById('productPage').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
+function showHome(){
+  document.getElementById('homePage').style.display='';
+  document.getElementById('productPage').style.display='none';
+  activeCat='Todos';
+  subCatAtivo=null;
+  document.getElementById('homeView').style.display='';
+  document.getElementById('mainHdr').style.display='none';
+  document.getElementById('adsGrid').style.gridTemplateColumns='';
+  renderTopNav();renderCatsGrid();renderAds();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 // ===== ADMIN LIST =====
 function renderAdList(){document.getElementById('adCnt').textContent=ads.length;var l=document.getElementById('adminAdList');if(!ads.length){l.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Nenhum anúncio.</div>';return;}l.innerHTML=ads.map(function(a){var th=(a.fotos&&a.fotos[0])?'<img src="'+a.fotos[0]+'" style="width:100%;height:100%;object-fit:cover;"/>':a.emoji||'🏷️';return '<div class="ad-item"><div class="ad-thumb2">'+th+'</div><div class="ad-info"><div class="ad-info-title">'+a.titulo+'</div><div class="ad-info-sub">R$ '+a.preco+' · '+a.categoria+(a.destaque?' · ⭐':'')+'</div></div><div class="ad-btns"><button class="bedit" onclick="abrirFormAd('+a.id+')">✏️</button><button class="bdel" onclick="delAd('+a.id+')">✕</button></div></div>';}).join('');}
