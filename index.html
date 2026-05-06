@@ -136,10 +136,10 @@ main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 
 /* PRODUCT PAGE */
 #productPage{display:none;background:var(--bg);}
-.prod-inner{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+.prod-inner{max-width:1100px;margin:0 auto;padding:20px 16px 80px;}
 .breadcrumb{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .breadcrumb a{color:var(--red);cursor:pointer;}
-.prod-grid{display:grid;grid-template-columns:1fr 360px;gap:24px;}
+.prod-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;min-width:0;}
 .gallery-main{width:100%;aspect-ratio:4/3;background:#f5f0ee;border-radius:var(--radius);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;margin-bottom:10px;}
 .gallery-main img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:none;}
 .gallery-main img.on{display:block;}
@@ -158,14 +158,14 @@ main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 .det-item{background:#f8f8f8;border-radius:6px;padding:10px 12px;}
 .det-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
 .det-val{font-size:13px;font-weight:600;}
-.prod-info-box{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:20px;position:sticky;top:80px;}
+.prod-info-box{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:16px;position:sticky;top:80px;min-width:0;overflow:hidden;}
 .prod-cat{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
 .prod-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;line-height:1.3;margin-bottom:10px;}
 .prod-price{font-family:'Sora',sans-serif;font-size:30px;font-weight:800;color:var(--red);margin-bottom:8px;}
 .prod-local{font-size:13px;color:var(--muted);margin-bottom:14px;}
 .pag-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
 .pag-chip{font-size:11px;background:#f2f2f2;color:#555;padding:4px 10px;border-radius:20px;}
-.wpp-prod{width:100%;background:#25d366;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Sora',sans-serif;text-decoration:none;margin-bottom:10px;}
+.wpp-prod{width:100%;background:#25d366;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Sora',sans-serif;text-decoration:none;margin-bottom:8px;white-space:nowrap;}
 .wpp-prod:hover{background:#1fba58;}
 .share-btn{width:100%;background:#f2f2f2;border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;}
 .safety-box{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;margin-top:14px;font-size:12px;color:#666;line-height:1.6;}
@@ -283,7 +283,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 .bnr-sub{font-size:11px;color:var(--muted);margin-top:2px;}
 
 /* RESPONSIVE */
-@media(max-width:900px){.ads-grid{grid-template-columns:repeat(3,1fr);}.prod-grid{grid-template-columns:1fr;}}
+@media(max-width:900px){.ads-grid{grid-template-columns:repeat(3,1fr);}.prod-grid{grid-template-columns:1fr;}.prod-info-box{position:static;}}
 @media(max-width:640px){
   .hinner{padding:10px 12px;gap:8px;}.logo{font-size:18px;}.btn-anunciar{padding:7px 10px;font-size:12px;}
   .searchbar input{font-size:13px;padding:8px 10px;}.c-slide{height:200px;}.c-txt{padding:20px;}
@@ -443,7 +443,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
     <div class="breadcrumb"><a onclick="showHome()">🏠 Início</a> › <span id="bcCat"></span> › <span id="bcTitle" style="color:var(--text);font-weight:500;"></span></div>
     <div class="prod-grid">
       <div>
-        <div class="gallery-wrap">
+        <div class="gallery-wrap" id="galleryWrap">
           <div class="g-thumbs" id="gThumbs"></div>
           <div class="gallery-main" id="galleryMain"><span id="gEmoji">🏷️</span></div>
         </div>
