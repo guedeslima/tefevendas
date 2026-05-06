@@ -1298,8 +1298,8 @@ function fecharNotif(){
 }
 function initNotifPopup(){
   // Show popup after 30 seconds if not already registered or closed
-  if(localStorage.getItem('notifCadastrado')||localStorage.getItem('notifFechado')) return;
-  setTimeout(function(){abrirNotif();},30000);
+  if(localStorage.getItem('notifCadastrado')) return;
+  setTimeout(function(){abrirNotif();},2000);
 }
 async function cadastrarNotif(){
   var nome=document.getElementById('notifNome').value.trim();
