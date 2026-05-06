@@ -443,9 +443,9 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
     <div class="breadcrumb"><a onclick="showHome()">🏠 Início</a> › <span id="bcCat"></span> › <span id="bcTitle" style="color:var(--text);font-weight:500;"></span></div>
     <div class="prod-grid">
       <div>
-        <div class="gallery-wrap" id="galleryWrap">
-          <div class="g-thumbs" id="gThumbs"></div>
-          <div class="gallery-main" id="galleryMain"><span id="gEmoji">🏷️</span></div>
+        <div id="galleryWrap" style="display:flex!important;flex-direction:row!important;gap:10px;margin-bottom:16px;align-items:flex-start;width:100%;">
+          <div id="gThumbs" style="display:flex!important;flex-direction:column!important;gap:6px;flex-shrink:0;width:72px;"></div>
+          <div id="galleryMain" style="flex:1;height:420px;background:#f8f8f8;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;"><span id="gEmoji">🏷️</span></div>
         </div>
         <div class="prod-desc">
           <h3>📋 Descrição</h3>
@@ -1108,24 +1108,30 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
     emj.textContent=a.emoji||'🏷️';
     gt.innerHTML='';
     if(galleryFotos.length){
-      // Add images in correct order using appendChild (not insertBefore)
       galleryFotos.forEach(function(src,i){
+        // Big image
         var img=document.createElement('img');
         img.src=src;
         img.alt='Foto '+(i+1);
-        if(i===0) img.classList.add('on');
+        img.style.cssText='width:100%;height:100%;object-fit:contain;padding:10px;position:absolute;top:0;left:0;display:'+(i===0?'block':'none')+';';
         gm.appendChild(img);
         // Thumbnail
         var th=document.createElement('div');
-        th.className='g-thumb'+(i===0?' on':'');
-        var ti=document.createElement('img');ti.src=src;
+        th.style.cssText='width:70px;height:70px;border-radius:8px;overflow:hidden;cursor:pointer;border:'+(i===0?'2px solid var(--red)':'2px solid #eee')+';flex-shrink:0;background:#f5f0ee;';
+        var ti=document.createElement('img');
+        ti.src=src;
+        ti.style.cssText='width:100%;height:100%;object-fit:cover;';
         th.appendChild(ti);
         th.onclick=(function(idx){return function(){setGallery(idx);};})(i);
         gt.appendChild(th);
       });
       if(galleryFotos.length>1){
-        var pv=document.createElement('button');pv.className='g-nav p';pv.textContent='‹';pv.onclick=function(){moveGallery(-1);};
-        var nx=document.createElement('button');nx.className='g-nav n';nx.textContent='›';nx.onclick=function(){moveGallery(1);};
+        var pv=document.createElement('button');
+        pv.style.cssText='position:absolute;top:50%;transform:translateY(-50%);left:8px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;';
+        pv.textContent='‹';pv.onclick=function(){moveGallery(-1);};
+        var nx=document.createElement('button');
+        nx.style.cssText='position:absolute;top:50%;transform:translateY(-50%);right:8px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;';
+        nx.textContent='›';nx.onclick=function(){moveGallery(1);};
         gm.appendChild(pv);gm.appendChild(nx);
       }
     }
@@ -1140,16 +1146,13 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
 function setGallery(i){
   var imgs=Array.from(document.getElementById('galleryMain').querySelectorAll('img'));
   var ths=document.getElementById('gThumbs').querySelectorAll('.g-thumb');
-  imgs.forEach(function(x,ii){x.classList.toggle('on',ii===i);});
-  ths.forEach(function(x,ii){x.classList.toggle('on',ii===i);});
+  imgs.forEach(function(x,ii){x.style.display=ii===i?'block':'none';});
+  ths.forEach(function(x,ii){x.style.border=ii===i?'2px solid var(--red)':'2px solid #eee';});
   galIdx=i;
-  // Scroll thumbnail into view
-  if(ths[i]) ths[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
 function moveGallery(d){
-  var total=galleryFotos.length;
-  if(!total) return;
-  setGallery((galIdx+d+total)%total);
+  if(!galleryFotos.length) return;
+  setGallery((galIdx+d+galleryFotos.length)%galleryFotos.length);
 }
 function shareAd(){if(navigator.share)navigator.share({title:document.getElementById('prodTitle').textContent,url:window.location.href});else{navigator.clipboard.writeText(window.location.href);toast('Link copiado!','🔗');}}
 function showHome(){document.getElementById('homePage').style.display='';document.getElementById('productPage').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
