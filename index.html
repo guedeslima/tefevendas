@@ -1336,7 +1336,7 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
         gm.appendChild(pv);gm.appendChild(nx);
       }
     }
-    saveRoute('ad:'+a.id);
+    
   setHash('#produto/'+a.id);
   window.scrollTo({top:0,behavior:'smooth'});
   // Register view
@@ -1363,7 +1363,7 @@ function showHome(){
   document.getElementById('productPage').style.display='none';
   activeCat='Todos';
   subCatAtivo=null;
-  saveRoute('home');
+  
   document.getElementById('homeView').style.display='';
   document.getElementById('mainHdr').style.display='none';
   document.getElementById('adsGrid').style.gridTemplateColumns='';
@@ -1834,8 +1834,8 @@ function setHash(hash){
 
 function restoreFromHash(){
   var hash=window.location.hash;
-  if(!hash||hash==='#'||hash==='#/'){
-    showHome();return;
+  if(!hash||hash==='#'||hash==='#/'||hash===''){
+    renderAds();return;
   }
   if(hash==='#admin'){
     abrirPin();return;
@@ -2084,26 +2084,8 @@ cropArea.addEventListener('touchmove',function(e){if(!cropDrag.active)return;var
 cropArea.addEventListener('touchend',function(){cropDrag.active=false;});
 
 // ===== URL HASH NAVIGATION =====
-function saveRoute(route){
-  if(route==='home') history.pushState(null,'',window.location.pathname);
-  else history.pushState(null,'','#'+encodeURIComponent(route));
-}
-function loadRoute(){
-  var hash=decodeURIComponent(window.location.hash.slice(1));
-  if(!hash||hash==='home') return;
-  if(hash==='admin'){openPin();return;}
-  // Try to match category or product
-  if(hash.startsWith('cat:')){
-    var cat=hash.slice(4);
-    setTimeout(function(){selCat(cat);},500);
-  } else if(hash.startsWith('ad:')){
-    var adId=parseInt(hash.slice(3));
-    setTimeout(function(){
-      var ad=ads.find(function(a){return a.id===adId;});
-      if(ad) showProduct(ad);
-    },500);
-  }
-}
+
+
 window.addEventListener('popstate',function(){
   var hash=decodeURIComponent(window.location.hash.slice(1));
   if(!hash||hash==='home'){
