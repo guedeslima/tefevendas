@@ -1019,6 +1019,23 @@ var SUBCATS = {
   ],
   'Lojas': [
     {nome:'Lojas de Roupas',emoji:'👕'}
+  ],
+  'Serviços Gerais': [
+    {nome:'Limpeza',emoji:'🧹'},
+    {nome:'Manutenção',emoji:'🔧'},
+    {nome:'Apoio Operacional',emoji:'📦'}
+  ],
+  'Serviços em Geral': [
+    {nome:'Eletricista',emoji:'⚡'},
+    {nome:'Encanador',emoji:'🚿'},
+    {nome:'TI / Informática',emoji:'💻'},
+    {nome:'Diarista',emoji:'🏠'},
+    {nome:'Babá',emoji:'👶'},
+    {nome:'Pedreiro',emoji:'🏗️'},
+    {nome:'Soldador',emoji:'🔥'},
+    {nome:'Costureira',emoji:'🧵'},
+    {nome:'Manicure e Pedicure',emoji:'💅'},
+    {nome:'Nail Design',emoji:'💎'}
   ]
 };
 // Extra subcats loaded from Supabase
@@ -1219,9 +1236,41 @@ function showHome(){
 }
 
 // ===== ADMIN LIST =====
-function renderAdList(){document.getElementById('adCnt').textContent=ads.length;var l=document.getElementById('adminAdList');if(!ads.length){l.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Nenhum anúncio.</div>';return;}l.innerHTML=ads.map(function(a){var th=(a.fotos&&a.fotos[0])?'<img src="'+a.fotos[0]+'" style="width:100%;height:100%;object-fit:cover;"/>':a.emoji||'🏷️';return '<div class="ad-item"><div class="ad-thumb2">'+th+'</div><div class="ad-info"><div class="ad-info-title">'+a.titulo+'</div><div class="ad-info-sub">R$ '+a.preco+' · '+a.categoria+(a.destaque?' · ⭐':'')+'</div></div><div class="ad-btns"><button class="bedit" onclick="abrirFormAd('+a.id+')">✏️</button><button class="bdel" onclick="delAd('+a.id+')">✕</button></div></div>';}).join('');}
+function renderAdList(){
+  document.getElementById('adCnt').textContent=ads.length;
+  var l=document.getElementById('adminAdList');
+  if(!ads.length){l.innerHTML='<div style="color:#888;text-align:center;padding:20px;font-size:13px;">Nenhum anúncio.</div>';return;}
+  var grouped={};var order=[];
+  ads.forEach(function(a){
+    var cat=a.categoria||'Outros';
+    if(!grouped[cat]){grouped[cat]=[];order.push(cat);}
+    grouped[cat].push(a);
+  });
+  l.innerHTML='';
+  order.forEach(function(cat){
+    var grp=grouped[cat];
+    var catObj=cats.find(function(c){return c.nome===cat;})||{emoji:'🏷️'};
+    // Category header
+    var hdr=document.createElement('div');
+    hdr.style.cssText='background:#f2f2f2;border-radius:8px;padding:8px 12px;margin:14px 0 8px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;';
+    var icon=catObj.imagem?'<img src="'+catObj.imagem+'" style="width:22px;height:22px;border-radius:4px;object-fit:cover;"/>':'<span>'+catObj.emoji+'</span>';
+    hdr.innerHTML=icon+cat+' <span style="font-size:11px;font-weight:400;color:#888;">('+grp.length+')</span>';
+    l.appendChild(hdr);
+    // Ads in this category
+    grp.forEach(function(a){
+      var th=(a.fotos&&a.fotos[0])?'<img src="'+a.fotos[0]+'" style="width:100%;height:100%;object-fit:cover;"/>':a.emoji||'🏷️';
+      var sub=a.subcategoria?' · '+a.subcategoria:'';
+      var row=document.createElement('div');
+      row.className='ad-item';
+      row.innerHTML='<div class="ad-thumb2">'+th+'</div>'
+        +'<div class="ad-info"><div class="ad-info-title">'+a.titulo+'</div>'
+        +'<div class="ad-info-sub">'+(a.preco?'R$ '+a.preco+' · ':'')+a.categoria+sub+(a.destaque?' · ⭐':'')+'</div></div>'
+        +'<div class="ad-btns"><button class="bedit" onclick="abrirFormAd('+a.id+')">✏️</button><button class="bdel" onclick="delAd('+a.id+')">✕</button></div>';
+      l.appendChild(row);
+    });
+  });
+}
 
-// ===== AD FORM =====
 function abrirFormAd(id){var a=id?ads.find(function(x){return x.id===id;}):null;document.getElementById('adFormTitle').textContent=a?'Editar anúncio':'Novo anúncio';document.getElementById('adId').value=a?a.id:'';document.getElementById('adTitulo').value=a?a.titulo:'';document.getElementById('adPreco').value=a?a.preco:'';document.getElementById('adWpp').value=a?a.whatsapp:'';
 document.getElementById('adWpp2').value=a?a.whatsapp2||'':
 '';
