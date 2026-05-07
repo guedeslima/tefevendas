@@ -627,26 +627,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
           <input class="ainput" type="text" id="newCatNm" placeholder="Nome da categoria" style="margin-bottom:0;flex:1;" onkeydown="if(event.key==='Enter')addCat()"/>
           <button onclick="addCat()">+</button>
         </div>
-        <div class="adiv"></div>
-        <div class="alabel">Gerenciar Subcategorias</div>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Selecione uma categoria à esquerda para gerenciar suas subcategorias.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:300px;">
-          <!-- LEFT: Category list -->
-          <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
-            <div style="background:#f2f2f2;padding:10px 14px;font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;">Categorias</div>
-            <div id="subcatCatList" style="overflow-y:auto;max-height:280px;"></div>
-          </div>
-          <!-- RIGHT: Subcategory list -->
-          <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
-            <div style="background:#f2f2f2;padding:10px 14px;font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;" id="subcatRightTitle">Selecione uma categoria</div>
-            <div id="subcatSubList" style="overflow-y:auto;max-height:220px;padding:8px;"></div>
-            <div id="subcatAddRow" style="display:none;padding:8px;border-top:1px solid var(--border);gap:6px;align-items:center;">
-              <input type="text" id="newSubEmj" placeholder="🏷️" maxlength="4" style="width:42px;text-align:center;border:1.5px solid var(--border);border-radius:6px;padding:6px;font-size:15px;outline:none;"/>
-              <input type="text" id="newSubNm" placeholder="Nome da subcategoria" style="flex:1;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;outline:none;" onkeydown="if(event.key==='Enter')addSubcat()"/>
-              <button onclick="addSubcat()" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:700;">+</button>
-            </div>
-          </div>
-        </div>
+
       </div>
       <!-- CONFIG -->
       <div class="tcont" id="tCfg">
@@ -1476,15 +1457,19 @@ function renderCatList(){
   var l=document.getElementById('catEditList');
   l.innerHTML='';
   cats.forEach(function(c,i){
+    // Main container for cat + subcats
+    var catDiv=document.createElement('div');
+    catDiv.style.cssText='background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);';
+
+    // === CATEGORY ROW ===
     var row=document.createElement('div');
-    row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;padding:10px;align-items:center;background:#f8f8f8;border-radius:8px;margin-bottom:8px;';
+    row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;align-items:center;background:#fff;';
+
     // Thumb
     var thumb=document.createElement('div');
     thumb.id='cat_thumb_'+i;
-    thumb.style.cssText='width:50px;height:50px;border-radius:8px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid #ddd;';
+    thumb.style.cssText='width:50px;height:50px;border-radius:8px;overflow:hidden;background:#f5f0ee;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid #ddd;cursor:pointer;';
     thumb.innerHTML=c.imagem?'<img src="'+c.imagem+'" style="width:100%;height:100%;object-fit:cover;"/>':( c.emoji||'🏷️');
-    row.appendChild(thumb);
-    // File input
     var fi=document.createElement('input');
     fi.type='file';fi.accept='image/*';fi.style.display='none';
     fi.onchange=(function(idx2,th){return function(){
@@ -1495,16 +1480,18 @@ function renderCatList(){
       });
     };})(i,thumb);
     row.appendChild(fi);
-    // Photo button
+    thumb.onclick=(function(inp){return function(){inp.click();};})(fi);
+    row.appendChild(thumb);
+    // Photo btn
     var pb=document.createElement('button');
-    pb.style.cssText='background:#fff;border:1.5px solid #ddd;border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;flex-shrink:0;';
+    pb.style.cssText='background:#fff;border:1.5px solid #ddd;border-radius:6px;padding:5px 9px;font-size:11px;cursor:pointer;flex-shrink:0;';
     pb.textContent='📷 Foto';
     pb.onclick=(function(inp){return function(){inp.click();};})(fi);
     row.appendChild(pb);
     // Emoji
     var ei=document.createElement('input');
     ei.type='text';ei.value=c.emoji||'';ei.maxLength=4;ei.id='ce_e_'+i;ei.placeholder='🏷️';
-    ei.style.cssText='width:48px;text-align:center;font-size:18px;border:1.5px solid #ddd;border-radius:6px;padding:6px;outline:none;';
+    ei.style.cssText='width:46px;text-align:center;font-size:18px;border:1.5px solid #ddd;border-radius:6px;padding:5px;outline:none;';
     row.appendChild(ei);
     // Name
     var ni=document.createElement('input');
@@ -1523,9 +1510,114 @@ function renderCatList(){
     dl.textContent='✕';
     dl.onclick=(function(id2,nome2){return function(){delCat(id2,nome2);};})(c.id,c.nome);
     row.appendChild(dl);
-    l.appendChild(row);
+    catDiv.appendChild(row);
+
+    // === SUBCATEGORIES SECTION ===
+    var subSec=document.createElement('div');
+    subSec.style.cssText='background:#f9f9f9;border-top:1px solid #eee;padding:10px 12px 8px 20px;';
+    // Subcat label
+    var subLabel=document.createElement('div');
+    subLabel.style.cssText='font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;';
+    subLabel.textContent='↳ Subcategorias';
+    subSec.appendChild(subLabel);
+    // Existing subcats
+    var subs=SUBCATS[c.nome]||[];
+    subs.forEach(function(s,si){
+      var subRow=document.createElement('div');
+      subRow.style.cssText='display:flex;align-items:center;gap:6px;background:#fff;border-radius:8px;padding:7px 8px;margin-bottom:6px;border:1px solid #eee;';
+      // Sub thumb
+      var sThumb=document.createElement('div');
+      sThumb.style.cssText='width:36px;height:36px;border-radius:6px;overflow:hidden;background:#f5f0ee;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid #ddd;cursor:pointer;';
+      sThumb.innerHTML=s.imagem?'<img src="'+s.imagem+'" style="width:100%;height:100%;object-fit:cover;"/>':s.emoji||'🏷️';
+      var sfi=document.createElement('input');
+      sfi.type='file';sfi.accept='image/*';sfi.style.display='none';
+      sfi.onchange=(function(catNome,subIdx,th){return function(){
+        var f=this.files[0];if(!f)return;
+        openCrop(f,function(croppedFile,dataUrl){
+          if(!SUBCATS[catNome])SUBCATS[catNome]=[];
+          SUBCATS[catNome][subIdx].imagem=dataUrl;
+          SUBCATS[catNome][subIdx]._newImg=croppedFile;
+          th.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover;"/>';
+        });
+      };})(c.nome,si,sThumb);
+      sThumb.onclick=(function(inp){return function(){inp.click();};})(sfi);
+      subRow.appendChild(sfi);
+      subRow.appendChild(sThumb);
+      // Sub photo btn
+      var spb=document.createElement('button');
+      spb.style.cssText='background:#fff;border:1px solid #ddd;border-radius:5px;padding:4px 7px;font-size:10px;cursor:pointer;flex-shrink:0;';
+      spb.textContent='📷';
+      spb.onclick=(function(inp){return function(){inp.click();};})(sfi);
+      subRow.appendChild(spb);
+      // Sub emoji
+      var sei=document.createElement('input');
+      sei.type='text';sei.value=s.emoji||'';sei.maxLength=4;
+      sei.style.cssText='width:36px;text-align:center;font-size:15px;border:1px solid #ddd;border-radius:5px;padding:4px;outline:none;';
+      subRow.appendChild(sei);
+      // Sub name
+      var sni=document.createElement('input');
+      sni.type='text';sni.value=s.nome;
+      sni.style.cssText='flex:1;border:1px solid #ddd;border-radius:5px;padding:6px 8px;font-size:12px;outline:none;';
+      subRow.appendChild(sni);
+      // Sub save
+      var ssv=document.createElement('button');
+      ssv.style.cssText='background:var(--red);color:#fff;border:none;border-radius:5px;padding:6px 10px;font-size:11px;cursor:pointer;font-weight:600;';
+      ssv.textContent='✔';
+      ssv.onclick=(function(catNome,subIdx,nameInp,emjInp){return function(){
+        if(SUBCATS[catNome]){
+          SUBCATS[catNome][subIdx].nome=nameInp.value.trim();
+          SUBCATS[catNome][subIdx].emoji=emjInp.value.trim()||'🏷️';
+        }
+        toast('Subcategoria salva!');
+        renderCatList();
+      };})(c.nome,si,sni,sei);
+      subRow.appendChild(ssv);
+      // Sub delete
+      var sdl=document.createElement('button');
+      sdl.style.cssText='background:#fff0ef;border:1px solid #fcc;border-radius:5px;padding:6px 8px;font-size:11px;cursor:pointer;color:var(--red);';
+      sdl.textContent='✕';
+      sdl.onclick=(function(catNome,subIdx){return function(){
+        if(SUBCATS[catNome])SUBCATS[catNome].splice(subIdx,1);
+        renderCatList();
+        atualizarSubcatSelect();
+        toast('Removida!','🗑️');
+      };})(c.nome,si);
+      subRow.appendChild(sdl);
+      subSec.appendChild(subRow);
+    });
+    // Add new subcat row
+    var addRow=document.createElement('div');
+    addRow.style.cssText='display:flex;align-items:center;gap:6px;margin-top:4px;';
+    var newEmj=document.createElement('input');
+    newEmj.type='text';newEmj.placeholder='🏷️';newEmj.maxLength=4;
+    newEmj.style.cssText='width:42px;text-align:center;font-size:15px;border:1px solid #ddd;border-radius:6px;padding:5px;outline:none;';
+    var newNm=document.createElement('input');
+    newNm.type='text';newNm.placeholder='+ Nova subcategoria';
+    newNm.style.cssText='flex:1;border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:12px;outline:none;';
+    newNm.onkeydown=(function(catNome,emjI,nmI){return function(e){if(e.key==='Enter')addSubcatTo(catNome,emjI,nmI);};})(c.nome,newEmj,newNm);
+    var addBtn=document.createElement('button');
+    addBtn.style.cssText='background:var(--red);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;font-weight:700;';
+    addBtn.textContent='+';
+    addBtn.onclick=(function(catNome,emjI,nmI){return function(){addSubcatTo(catNome,emjI,nmI);};})(c.nome,newEmj,newNm);
+    addRow.appendChild(newEmj);addRow.appendChild(newNm);addRow.appendChild(addBtn);
+    subSec.appendChild(addRow);
+    catDiv.appendChild(subSec);
+    l.appendChild(catDiv);
   });
 }
+
+function addSubcatTo(catNome,emjInp,nmInp){
+  var e=emjInp.value.trim()||'🏷️';
+  var n=nmInp.value.trim();
+  if(!n){toast('Digite o nome!','⚠️');return;}
+  if(!SUBCATS[catNome])SUBCATS[catNome]=[];
+  SUBCATS[catNome].push({nome:n,emoji:e});
+  emjInp.value='';nmInp.value='';
+  renderCatList();
+  atualizarSubcatSelect();
+  toast('Subcategoria adicionada!');
+}
+
 
 async function salvarCat(i){
   var e=document.getElementById('ce_e_'+i).value.trim()||'🏷️';
