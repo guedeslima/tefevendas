@@ -1594,9 +1594,11 @@ function renderCatList(){
       sfi.onchange=(function(catNome,subIdx,th){return function(){
         var f=this.files[0];if(!f)return;
         openCrop(f,function(croppedFile,dataUrl){
-          if(!SUBCATS[catNome])SUBCATS[catNome]=[];
+          if(!SUBCATS[catNome]) SUBCATS[catNome]=[];
+          if(!SUBCATS[catNome][subIdx]) SUBCATS[catNome][subIdx]={};
           SUBCATS[catNome][subIdx].imagem=dataUrl;
           SUBCATS[catNome][subIdx]._newImg=croppedFile;
+          console.log('Crop salvo em SUBCATS['+catNome+']['+subIdx+']:', SUBCATS[catNome][subIdx]._newImg);
           th.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover;"/>';
         });
       };})(c.nome,si,sThumb);
