@@ -2110,6 +2110,34 @@ function updateVersText(){
   },500);
 }
 
+function setHash(hash){
+  try{history.pushState(null,null,hash||'#');}catch(e){}
+}
+
+function restoreFromHash(){
+  var hash=window.location.hash;
+  if(!hash||hash==='#'||hash===''){renderAds();return;}
+  if(hash==='#admin'){abrirPin();return;}
+  if(hash.startsWith('#produto/')){
+    var id=parseInt(hash.replace('#produto/',''));
+    var ad=ads.find(function(a){return a.id===id;});
+    if(ad)showProduct(ad);else showHome();return;
+  }
+  if(hash.startsWith('#cat/')){
+    var cat=decodeURIComponent(hash.replace('#cat/',''));
+    selCat(cat);return;
+  }
+  if(hash.startsWith('#subcat/')){
+    var parts=hash.replace('#subcat/','').split('/');
+    var cat2=decodeURIComponent(parts[0]);
+    var sub=decodeURIComponent(parts[1]||'');
+    if(sub)selSubCat(cat2,sub);else showSubCats(cat2);return;
+  }
+  showHome();
+}
+
+window.addEventListener('popstate',function(){restoreFromHash();});
+
 async function init(){
   try{
     var cfgRows=await sbGet('config','select=chave,valor');
