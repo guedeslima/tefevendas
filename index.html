@@ -1098,27 +1098,93 @@ var subCatAtivo=null;
 function selCat(cat){activeCat=cat;renderTopNav();renderCatsGrid();renderAds();if(cat==='Todos'){document.getElementById('homeView').style.display='';document.getElementById('mainHdr').style.display='none';}else{document.getElementById('homeView').style.display='none';document.getElementById('mainHdr').style.display='flex';document.getElementById('mainTitle').textContent=cat;}window.scrollTo({top:0,behavior:'smooth'});}
 
 // ===== RENDER ADS =====
+function makeAdCard(a){
+  var card=document.createElement('div');card.className='ad-card';
+  card.onclick=(function(ad){return function(){showProduct(ad);};})(a);
+  var thumb=document.createElement('div');thumb.className='ad-thumb';
+  if(a.fotos&&a.fotos[0]){var img=document.createElement('img');img.src=a.fotos[0];img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';thumb.appendChild(img);}
+  else{thumb.textContent=a.emoji||'🏷️';}
+  if(a.destaque){var bd=document.createElement('div');bd.className='dest-badge';bd.textContent='⭐ Destaque';thumb.appendChild(bd);}
+  var isServ=a.categoria==='Serviços'||a.categoria==='Serviços Gerais'||a.categoria==='Serviços em Geral';
+  if(isServ){var sb=document.createElement('div');sb.style.cssText='position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.5px;';sb.textContent='SERVIÇO';thumb.appendChild(sb);}
+  card.appendChild(thumb);
+  var body=document.createElement('div');body.className='ad-body';
+  var priceVal=a.preco||'';var isNum=/^[\d.,\s]+$/.test(priceVal.trim());
+  var priceHtml=isServ?'<div class="ad-price" style="font-size:14px;color:#555;">💰 '+(isNum?'R$ ':'')+priceVal+'</div>':'<div class="ad-price">'+(isNum?'R$ ':'')+priceVal+'</div>';
+  var subtitulo=a.subcategoria?a.subcategoria:a.categoria;
+  body.innerHTML='<div class="ad-cat">'+subtitulo+(a.local?' · '+a.local:'')+'</div><div class="ad-title">'+a.titulo+'</div>'+priceHtml+'<div class="views-badge" id="vb_'+a.id+'"></div>';
+  var wl=document.createElement('a');wl.className='wpp-card';wl.href='https://wa.me/'+a.whatsapp+'?text='+wppMsg(a);wl.target='_blank';wl.innerHTML=WSVG+' Chamar no WhatsApp';wl.onclick=function(e){e.stopPropagation();};
+  body.appendChild(wl);card.appendChild(body);
+  return card;
+}
+
 function renderAds(){
   var q=document.getElementById('searchInput').value.toLowerCase();
-  var f=ads.filter(function(a){var mc=activeCat==='Todos'||a.categoria===activeCat;var ms=!q||a.titulo.toLowerCase().includes(q)||(a.descricao||'').toLowerCase().includes(q);return mc&&ms;});
+  var f=ads.filter(function(a){
+    var mc=activeCat==='Todos'||a.categoria===activeCat;
+    var ms=!q||a.titulo.toLowerCase().includes(q)||(a.descricao||'').toLowerCase().includes(q);
+    return mc&&ms;
+  });
   document.getElementById('resInfo').textContent=f.length+' anúncio'+(f.length!==1?'s':'');
   var g=document.getElementById('adsGrid'),em=document.getElementById('emptyEl');
-  g.innerHTML='';if(!f.length){em.style.display='block';return;}em.style.display='none';
-  if(activeCat!=='Todos')document.getElementById('mainHdr').style.display='flex';
+  g.innerHTML='';
+  if(!f.length){em.style.display='block';return;}
+  em.style.display='none';
+
+  // Categoria específica - lista plana
+  if(activeCat!=='Todos'){
+    document.getElementById('mainHdr').style.display='flex';
+    f.forEach(function(a){g.appendChild(makeAdCard(a));});
+    return;
+  }
+
+  // Todos - agrupar por categoria
+  var grouped={};var order=[];
   f.forEach(function(a){
-    var card=document.createElement('div');card.className='ad-card';
-    card.onclick=(function(ad){return function(){showProduct(ad);};})(a);
-    var thumb=document.createElement('div');thumb.className='ad-thumb';
-    if(a.fotos&&a.fotos[0]){var img=document.createElement('img');img.src=a.fotos[0];img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';thumb.appendChild(img);}
-    else{thumb.textContent=a.emoji||'🏷️';}
-    if(a.destaque){var bd=document.createElement('div');bd.className='dest-badge';bd.textContent='⭐ Destaque';thumb.appendChild(bd);}
-    card.appendChild(thumb);
-    var body=document.createElement('div');body.className='ad-body';
-    body.innerHTML='<div class="ad-cat">'+a.categoria+(a.local?' · '+a.local:'')+'</div><div class="ad-title">'+a.titulo+'</div><div class="ad-price">R$ '+a.preco+'</div>';
-    var wl=document.createElement('a');wl.className='wpp-card';wl.href='https://wa.me/'+a.whatsapp+'?text='+wppMsg(a);wl.target='_blank';wl.innerHTML=WSVG+' Chamar no WhatsApp';wl.onclick=function(e){e.stopPropagation();};
-    body.appendChild(wl);card.appendChild(body);g.appendChild(card);
+    var cat=a.categoria||'Outros';
+    if(!grouped[cat]){grouped[cat]=[];order.push(cat);}
+    grouped[cat].push(a);
+  });
+
+  order.forEach(function(cat){
+    var grp=grouped[cat];
+    var catObj=cats.find(function(c){return c.nome===cat;})||{emoji:'🏷️',nome:cat,imagem:null};
+
+    // Cabeçalho da categoria
+    var hdr=document.createElement('div');
+    hdr.style.cssText='grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-top:28px;margin-bottom:8px;padding-bottom:10px;border-bottom:2px solid var(--border);';
+    var iconHtml=catObj.imagem
+      ?'<img src="'+catObj.imagem+'" style="width:30px;height:30px;border-radius:6px;object-fit:cover;"/>'
+      :'<span style="font-size:24px;">'+catObj.emoji+'</span>';
+    var hdrLeft=document.createElement('div');hdrLeft.style.cssText='display:flex;align-items:center;gap:10px;';
+    hdrLeft.innerHTML=iconHtml;
+    var hdrTitle=document.createElement('span');hdrTitle.style.cssText='font-size:17px;font-weight:700;';hdrTitle.textContent=cat;hdrLeft.appendChild(hdrTitle);
+    var hdrCount=document.createElement('span');hdrCount.style.cssText='font-size:12px;color:#888;margin-left:6px;';hdrCount.textContent=grp.length+' anúncio'+(grp.length!==1?'s':'');hdrLeft.appendChild(hdrCount);
+    hdr.appendChild(hdrLeft);
+    var verBtn=document.createElement('button');
+    verBtn.style.cssText='background:none;border:1.5px solid var(--red);border-radius:20px;padding:5px 14px;font-size:12px;cursor:pointer;color:var(--red);font-weight:600;';
+    verBtn.textContent='Ver todos →';
+    verBtn.onclick=(function(c){return function(){selCat(c);};})(cat);
+    hdr.appendChild(verBtn);
+    g.appendChild(hdr);
+
+    // Cards (max 4)
+    grp.slice(0,4).forEach(function(a){g.appendChild(makeAdCard(a));});
+
+    // Ver mais
+    if(grp.length>4){
+      var more=document.createElement('div');
+      more.style.cssText='grid-column:1/-1;text-align:center;padding:10px 0 4px;';
+      var moreBtn=document.createElement('button');
+      moreBtn.style.cssText='background:var(--rlight);border:1.5px solid var(--red);border-radius:20px;padding:9px 22px;font-size:13px;cursor:pointer;color:var(--red);font-weight:600;';
+      moreBtn.textContent='Ver mais '+(grp.length-4)+' em '+cat+' →';
+      moreBtn.onclick=(function(c){return function(){selCat(c);};})(cat);
+      more.appendChild(moreBtn);
+      g.appendChild(more);
+    }
   });
 }
+
 function filterAds(){if(document.getElementById('searchInput').value){activeCat='Todos';document.getElementById('homeView').style.display='none';document.getElementById('mainHdr').style.display='flex';document.getElementById('mainTitle').textContent='Resultados';renderTopNav();renderCatsGrid();}renderAds();}
 
 // ===== PRODUCT PAGE =====
