@@ -1095,7 +1095,21 @@ var SUBCATS = {
 var SUBCATS_EXTRA={};
 var subCatAtivo=null;
 
-function selCat(cat){activeCat=cat;renderTopNav();renderCatsGrid();renderAds();if(cat==='Todos'){document.getElementById('homeView').style.display='';document.getElementById('mainHdr').style.display='none';}else{document.getElementById('homeView').style.display='none';document.getElementById('mainHdr').style.display='flex';document.getElementById('mainTitle').textContent=cat;}window.scrollTo({top:0,behavior:'smooth'});}
+function selCat(cat){
+  activeCat=cat;
+  renderTopNav();renderCatsGrid();renderAds();
+  if(cat==='Todos'){
+    document.getElementById('homeView').style.display='';
+    document.getElementById('mainHdr').style.display='none';
+    setHash('#');
+  }else{
+    document.getElementById('homeView').style.display='none';
+    document.getElementById('mainHdr').style.display='flex';
+    document.getElementById('mainTitle').textContent=cat;
+    setHash('#cat/'+encodeURIComponent(cat));
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 // ===== RENDER ADS =====
 function makeAdCard(a){
@@ -1987,7 +2001,7 @@ async function init(){
   renderCarousel();renderTopNav();renderCatsGrid();renderAds();
   document.getElementById('loadingScreen').style.display='none';
   initNotifPopup();
-  loadRoute();
+  restoreFromHash();
 }
 init();
 
