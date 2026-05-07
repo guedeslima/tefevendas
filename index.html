@@ -1912,16 +1912,17 @@ function openCrop(file,cb){
       cropNatH=img.naturalHeight||1;
       cropX=0;cropY=0;
       document.getElementById('cropModal').classList.add('on');
-      // Wait for modal to render then fit
+      // Wait for modal to be visible then fit image to fill area
       setTimeout(function(){
         var area=document.getElementById('cropArea');
-        var aw=area.offsetWidth||300;
-        var ah=area.offsetHeight||300;
+        var aw=area.offsetWidth||320;
+        var ah=area.offsetHeight||320;
+        // Scale to COVER entire area (no black borders)
         cropScale=Math.max(aw/cropNatW,ah/cropNatH);
         cropX=0;cropY=0;
         document.getElementById('cropZoom').value=100;
         renderCrop();
-      },80);
+      },100);
     };
     img.src=e.target.result;
   };
