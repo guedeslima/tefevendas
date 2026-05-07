@@ -1601,7 +1601,7 @@ function renderCatList(){
         });
       };})(c.nome,si,sThumb);
       sThumb.onclick=(function(inp){return function(){inp.click();};})(sfi);
-      subRow.appendChild(sfi);
+      document.body.appendChild(sfi);
       subRow.appendChild(sThumb);
       // Sub photo btn
       var spb=document.createElement('button');
