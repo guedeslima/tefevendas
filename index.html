@@ -814,6 +814,7 @@ function checkPin(){
 
 // ===== ADMIN =====
 function abrirAdmin(){
+  setHash('#admin');
   document.getElementById('adminPanel').classList.add('on');
   document.getElementById('cfgWpp').value=MEU_WPP;
   document.getElementById('cfgPreco').value=PRECO;
@@ -827,7 +828,7 @@ function abrirAdmin(){
   var sb=document.getElementById('cfgStatBans');if(sb)sb.textContent=banners.length;
   renderAdList();renderBanList();renderCatList();renderNotifList();renderLojasSubList();
 }
-function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');}
+function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');setHash('#');}
 // Admin panel does not close on outside click
 
 // ===== SECRET DOTS TRIGGER =====
@@ -1203,7 +1204,9 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
         gm.appendChild(pv);gm.appendChild(nx);
       }
     }
-    window.scrollTo({top:0,behavior:'smooth'});
+    saveRoute('ad:'+a.id);
+  setHash('#produto/'+a.id);
+  window.scrollTo({top:0,behavior:'smooth'});
   // Register view
   registrarView(a.id).then(function(total){
     var vb=document.getElementById('prodViewsBadge');
@@ -1228,6 +1231,7 @@ function showHome(){
   document.getElementById('productPage').style.display='none';
   activeCat='Todos';
   subCatAtivo=null;
+  saveRoute('home');
   document.getElementById('homeView').style.display='';
   document.getElementById('mainHdr').style.display='none';
   document.getElementById('adsGrid').style.gridTemplateColumns='';
@@ -1554,6 +1558,45 @@ function atualizarSubcatSelect(){
   toggleSubcat(cat.value);
 }
 
+// ===== URL HASH NAVIGATION =====
+function setHash(hash){
+  history.pushState(null,null,hash||'#');
+}
+
+function restoreFromHash(){
+  var hash=window.location.hash;
+  if(!hash||hash==='#'||hash==='#/'){
+    showHome();return;
+  }
+  if(hash==='#admin'){
+    abrirPin();return;
+  }
+  if(hash.startsWith('#produto/')){
+    var id=parseInt(hash.replace('#produto/',''));
+    var ad=ads.find(function(a){return a.id===id;});
+    if(ad){showProduct(ad);}
+    else showHome();
+    return;
+  }
+  if(hash.startsWith('#cat/')){
+    var cat=decodeURIComponent(hash.replace('#cat/',''));
+    selCat(cat);return;
+  }
+  if(hash.startsWith('#subcat/')){
+    var parts=hash.replace('#subcat/','').split('/');
+    var cat2=decodeURIComponent(parts[0]);
+    var sub=decodeURIComponent(parts[1]||'');
+    if(sub) selSubCat(cat2,sub);
+    else showSubCats(cat2);
+    return;
+  }
+  showHome();
+}
+
+window.addEventListener('popstate',function(){
+  restoreFromHash();
+});
+
 // ===== SCROLL =====
 window.addEventListener('scroll',function(){var b=document.getElementById('backTop');if(b)b.style.display=window.scrollY>300?'flex':'none';});
 
@@ -1689,8 +1732,45 @@ async function init(){
   renderCarousel();renderTopNav();renderCatsGrid();renderAds();
   document.getElementById('loadingScreen').style.display='none';
   initNotifPopup();
+  loadRoute();
 }
 init();
+
+// ===== URL HASH NAVIGATION =====
+function saveRoute(route){
+  if(route==='home') history.pushState(null,'',window.location.pathname);
+  else history.pushState(null,'','#'+encodeURIComponent(route));
+}
+function loadRoute(){
+  var hash=decodeURIComponent(window.location.hash.slice(1));
+  if(!hash||hash==='home') return;
+  if(hash==='admin'){openPin();return;}
+  // Try to match category or product
+  if(hash.startsWith('cat:')){
+    var cat=hash.slice(4);
+    setTimeout(function(){selCat(cat);},500);
+  } else if(hash.startsWith('ad:')){
+    var adId=parseInt(hash.slice(3));
+    setTimeout(function(){
+      var ad=ads.find(function(a){return a.id===adId;});
+      if(ad) showProduct(ad);
+    },500);
+  }
+}
+window.addEventListener('popstate',function(){
+  var hash=decodeURIComponent(window.location.hash.slice(1));
+  if(!hash||hash==='home'){
+    showHome();
+  } else if(hash.startsWith('cat:')){
+    var cat=hash.slice(4);
+    selCat(cat);
+  } else if(hash.startsWith('ad:')){
+    var adId=parseInt(hash.slice(3));
+    var ad=ads.find(function(a){return a.id===adId;});
+    if(ad) showProduct(ad);
+    else showHome();
+  }
+});
 </script>
 </body>
 </html>
