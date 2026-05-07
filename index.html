@@ -1911,7 +1911,7 @@ function openCrop(file,cb){
       cropNatW=img.naturalWidth||1;
       cropNatH=img.naturalHeight||1;
       cropX=0;cropY=0;
-      document.getElementById('cropModal').classList.add('on');
+      var cm=document.getElementById('cropModal');cm.classList.add('on');cm.style.display='flex';cm.style.zIndex='2147483647';
       // Wait for modal to be visible then fit image to fill area
       setTimeout(function(){
         var area=document.getElementById('cropArea');
