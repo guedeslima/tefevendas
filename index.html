@@ -1017,16 +1017,12 @@ function renderTopNav(){
 function renderCatsGrid(){
   var g=document.getElementById('catsGrid');g.innerHTML='';
   var counts={};ads.forEach(function(a){counts[a.categoria]=(counts[a.categoria]||0)+1;});
-  var bgColors=['#f0eeff','#fff0f0','#f0fff4','#fff8f0','#f0f8ff','#fff0f8','#f0ffff','#fffff0'];
   function mk(nome,emj,img,cnt,act){
     var c=document.createElement('div');
     c.className='cat-card'+(act?' active':'');
     // Image area
     var wrap=document.createElement('div');
-    var bgIdx=g.children.length%bgColors.length;
     wrap.className='cat-img-wrap';
-    wrap.style.background=bgColors[bgIdx];
-    c.style.background=bgColors[bgIdx];
     if(img){
       var im=document.createElement('img');
       im.src=img;im.alt=nome;
