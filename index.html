@@ -1949,7 +1949,7 @@ function renderCrop(){
     +'max-width:none;max-height:none;user-select:none;pointer-events:none;';
 }
 
-function cancelCrop(){document.getElementById('cropModal').classList.remove('on');cropCallback=null;}
+function cancelCrop(){var cm=document.getElementById('cropModal');cm.classList.remove('on');cm.style.display='none';cropCallback=null;}
 
 function confirmCrop(){
   var img=document.getElementById('cropImg');
@@ -1966,7 +1966,7 @@ function confirmCrop(){
   ctx.drawImage(img,sx,sy,sw2,sh2,0,0,600,600);
   canvas.toBlob(function(blob){
     var f=new File([blob],'crop_'+Date.now()+'.jpg',{type:'image/jpeg'});
-    document.getElementById('cropModal').classList.remove('on');
+    var cm=document.getElementById('cropModal');cm.classList.remove('on');cm.style.display='none';
     if(cropCallback)cropCallback(f,canvas.toDataURL('image/jpeg',0.92));
     cropCallback=null;
   },'image/jpeg',0.92);
