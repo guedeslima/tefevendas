@@ -1628,8 +1628,24 @@ function renderCatList(){
           SUBCATS[catNome][subIdx].nome=nameInp.value.trim();
           SUBCATS[catNome][subIdx].emoji=emjInp.value.trim()||'🏷️';
         }
-        toast('Subcategoria salva!');
-        renderCatList();
+        // Upload image if new one was selected
+        var sub=SUBCATS[catNome]&&SUBCATS[catNome][subIdx];
+        if(sub&&sub._newImg){
+          sync(true);
+          uploadFoto(sub._newImg).then(function(url){
+            SUBCATS[catNome][subIdx].imagem=url;
+            SUBCATS[catNome][subIdx]._newImg=null;
+            sync(false);
+            toast('✅ Subcategoria salva com imagem!');
+            renderCatList();
+          }).catch(function(e){
+            sync(false);
+            toast('Erro ao salvar imagem: '+e.message,'❌');
+          });
+        } else {
+          toast('✅ Subcategoria salva!');
+          renderCatList();
+        }
       };})(c.nome,si,sni,sei);
       subRow.appendChild(ssv);
       // Sub delete
