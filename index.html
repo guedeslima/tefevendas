@@ -2046,6 +2046,69 @@ function shareWhatsApp(){
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 
+// ===== VERSÍCULOS DA BÍBLIA =====
+var VERSICULOS=[
+  {texto:"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",ref:"João 3:16"},
+  {texto:"O Senhor é o meu pastor e nada me faltará.",ref:"Salmos 23:1"},
+  {texto:"Tudo posso naquele que me fortalece.",ref:"Filipenses 4:13"},
+  {texto:"Porque sou eu que conheço os planos que tenho para vocês, planos de fazê-los prosperar e não de causar dano, planos de dar a vocês esperança e um futuro.",ref:"Jeremias 29:11"},
+  {texto:"Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.",ref:"Salmos 37:5"},
+  {texto:"Não temas, porque eu sou contigo; não te assombres, porque eu sou teu Deus.",ref:"Isaías 41:10"},
+  {texto:"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti.",ref:"Números 6:24-25"},
+  {texto:"Mas os que esperam no Senhor renovarão as suas forças, subirão com asas como águias.",ref:"Isaías 40:31"},
+  {texto:"Aquietai-vos e sabei que eu sou Deus.",ref:"Salmos 46:10"},
+  {texto:"Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos.",ref:"Filipenses 4:4"},
+  {texto:"Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei.",ref:"Mateus 11:28"},
+  {texto:"Busca a Deus em primeiro lugar o seu reino e a sua justiça, e todas estas coisas vos serão acrescentadas.",ref:"Mateus 6:33"},
+  {texto:"Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.",ref:"Provérbios 3:5"},
+  {texto:"Sede fortes e corajosos! Não tenhais medo nem terror deles, pois é o Senhor, o teu Deus, que marcha contigo.",ref:"Deuteronômio 31:6"},
+  {texto:"A paz de Deus, que excede todo o entendimento, guardará os vossos corações em Cristo Jesus.",ref:"Filipenses 4:7"},
+  {texto:"O amor é paciente, é benigno; o amor não arde em ciúmes, não se vangloria.",ref:"1 Coríntios 13:4"},
+  {texto:"Bendize, ó minha alma, ao Senhor, e tudo o que há em mim bendiga o seu santo nome.",ref:"Salmos 103:1"},
+  {texto:"Esta é a vitória que vence o mundo: a nossa fé.",ref:"1 João 5:4"},
+  {texto:"Porque a minha força se aperfeiçoa na fraqueza.",ref:"2 Coríntios 12:9"},
+  {texto:"Porque eu sei os pensamentos que tenho a vosso respeito, diz o Senhor; pensamentos de paz.",ref:"Jeremias 29:11"}
+];
+var versUsados=[],versTimer=null;
+
+function getVersAleat(){
+  if(versUsados.length>=VERSICULOS.length)versUsados=[];
+  var disp=VERSICULOS.filter(function(_,i){return !versUsados.includes(i);});
+  var idx=Math.floor(Math.random()*disp.length);
+  var v=disp[idx];
+  versUsados.push(VERSICULOS.indexOf(v));
+  return v;
+}
+
+function addVersSlide(){updateVersText();}
+
+function showVersSlide(){
+  var track=document.getElementById('cTrack');
+  if(!track)return;
+  var total=track.children.length;
+  goCar(total-1);
+}
+
+function startVersTimer(){
+  clearInterval(versTimer);
+  versTimer=setInterval(function(){updateVersText();},2*60*1000);
+}
+
+function updateVersText(){
+  var slide=document.getElementById('versSlidEl');
+  if(!slide)return;
+  var v=getVersAleat();
+  var vtxt=slide.querySelector('.vtxt');
+  var vref=slide.querySelector('.vref');
+  if(!vtxt||!vref)return;
+  vtxt.style.opacity='0';vref.style.opacity='0';
+  setTimeout(function(){
+    vtxt.textContent='"'+v.texto+'"';
+    vref.textContent='— '+v.ref;
+    vtxt.style.opacity='1';vref.style.opacity='1';
+  },500);
+}
+
 async function init(){
   try{
     var cfgRows=await sbGet('config','select=chave,valor');
