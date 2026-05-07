@@ -1910,18 +1910,17 @@ function openCrop(file,cb){
       cropNatW=img.naturalWidth||1;
       cropNatH=img.naturalHeight||1;
       cropX=0;cropY=0;
-      document.getElementById('cropZoom').value=100;
       document.getElementById('cropModal').classList.add('on');
-      // Wait for modal to be visible before measuring area
+      // Wait for modal to render then fit
       setTimeout(function(){
         var area=document.getElementById('cropArea');
         var aw=area.offsetWidth||300;
         var ah=area.offsetHeight||300;
-        // Scale image to COVER entire area
         cropScale=Math.max(aw/cropNatW,ah/cropNatH);
         cropX=0;cropY=0;
+        document.getElementById('cropZoom').value=100;
         renderCrop();
-      },50);
+      },80);
     };
     img.src=e.target.result;
   };
@@ -1935,52 +1934,29 @@ function renderCrop(){
   var ah=area.offsetHeight||300;
   var sw=cropNatW*cropScale;
   var sh=cropNatH*cropScale;
-  // Ensure image covers entire area
+  // Ensure covers area
   if(sw<aw||sh<ah){
     cropScale=Math.max(aw/cropNatW,ah/cropNatH);
-    sw=cropNatW*cropScale;
-    sh=cropNatH*cropScale;
+    sw=cropNatW*cropScale;sh=cropNatH*cropScale;
   }
-  // Clamp position so image always covers area
-  var mx=(sw-aw)/2;
-  var my=(sh-ah)/2;
+  var mx=(sw-aw)/2;var my=(sh-ah)/2;
   cropX=Math.max(-mx,Math.min(mx,cropX));
   cropY=Math.max(-my,Math.min(my,cropY));
-  var left=(aw-sw)/2+cropX;
-  var top=(ah-sh)/2+cropY;
-  img.style.cssText='position:absolute;width:'+sw+'px;height:'+sh+'px;left:'+left+'px;top:'+top+'px;max-width:none;max-height:none;user-select:none;pointer-events:none;';
+  img.style.cssText='position:absolute;width:'+sw+'px;height:'+sh+'px;'
+    +'left:'+((aw-sw)/2+cropX)+'px;top:'+((ah-sh)/2+cropY)+'px;'
+    +'max-width:none;max-height:none;user-select:none;pointer-events:none;';
 }
-
-
-
-window.addEventListener('mousemove',function(e){if(!cropDrag.on)return;cropX=cropDrag.ox+(e.clientX-cropDrag.sx);cropY=cropDrag.oy+(e.clientY-cropDrag.sy);renderCrop();});
-window.addEventListener('mouseup',function(){cropDrag.on=false;});
-document.addEventListener('DOMContentLoaded',function(){
-  var ca=document.getElementById('cropArea');
-  if(!ca) return;
-  ca.addEventListener('mousedown',function(e){e.preventDefault();cropDrag.on=true;cropDrag.sx=e.clientX;cropDrag.sy=e.clientY;cropDrag.ox=cropX;cropDrag.oy=cropY;});
-  ca.addEventListener('touchstart',function(e){var t=e.touches[0];cropDrag.on=true;cropDrag.sx=t.clientX;cropDrag.sy=t.clientY;cropDrag.ox=cropX;cropDrag.oy=cropY;},{passive:true});
-  ca.addEventListener('touchmove',function(e){if(!cropDrag.on)return;var t=e.touches[0];cropX=cropDrag.ox+(t.clientX-cropDrag.sx);cropY=cropDrag.oy+(t.clientY-cropDrag.sy);renderCrop();e.preventDefault();},{passive:false});
-  ca.addEventListener('touchend',function(){cropDrag.on=false;});
-  document.getElementById('cropZoom').addEventListener('input',function(){
-    var area=document.getElementById('cropArea');
-    var aw=area.offsetWidth,ah=area.offsetHeight;
-    var baseScale=Math.max(aw/cropNatW,ah/cropNatH);
-    cropScale=baseScale*(parseInt(this.value)/100);
-    renderCrop();
-  });
-});
 
 function cancelCrop(){document.getElementById('cropModal').classList.remove('on');cropCallback=null;}
 
 function confirmCrop(){
   var img=document.getElementById('cropImg');
   var area=document.getElementById('cropArea');
-  var aw=area.offsetWidth,ah=area.offsetHeight;
-  var sw=cropNatW*cropScale,sh=cropNatH*cropScale;
-  var lx=(aw-sw)/2+cropX,ty=(ah-sh)/2+cropY;
-  var sx=-lx/cropScale,sy=-ty/cropScale;
-  var sw2=aw/cropScale,sh2=ah/cropScale;
+  var aw=area.offsetWidth||300;var ah=area.offsetHeight||300;
+  var sw=cropNatW*cropScale;var sh=cropNatH*cropScale;
+  var lx=(aw-sw)/2+cropX;var ty=(ah-sh)/2+cropY;
+  var sx=-lx/cropScale;var sy=-ty/cropScale;
+  var sw2=aw/cropScale;var sh2=ah/cropScale;
   var canvas=document.createElement('canvas');
   canvas.width=600;canvas.height=600;
   var ctx=canvas.getContext('2d');
@@ -1994,120 +1970,42 @@ function confirmCrop(){
   },'image/jpeg',0.92);
 }
 
-// ===== URL HASH NAVIGATION =====
-function setHash(hash){
-  history.pushState(null,null,hash||'#');
-}
-
-function restoreFromHash(){
-  var hash=window.location.hash;
-  if(!hash||hash==='#'||hash==='#/'||hash===''){
-    renderAds();return;
-  }
-  if(hash==='#admin'){
-    abrirPin();return;
-  }
-  if(hash.startsWith('#produto/')){
-    var id=parseInt(hash.replace('#produto/',''));
-    var ad=ads.find(function(a){return a.id===id;});
-    if(ad){showProduct(ad);}
-    else showHome();
-    return;
-  }
-  if(hash.startsWith('#cat/')){
-    var cat=decodeURIComponent(hash.replace('#cat/',''));
-    selCat(cat);return;
-  }
-  if(hash.startsWith('#subcat/')){
-    var parts=hash.replace('#subcat/','').split('/');
-    var cat2=decodeURIComponent(parts[0]);
-    var sub=decodeURIComponent(parts[1]||'');
-    if(sub) selSubCat(cat2,sub);
-    else showSubCats(cat2);
-    return;
-  }
-  showHome();
-}
-
-window.addEventListener('popstate',function(){
-  restoreFromHash();
+// Mouse drag
+document.addEventListener('DOMContentLoaded',function(){
+  var ca=document.getElementById('cropArea');
+  if(!ca)return;
+  ca.addEventListener('mousedown',function(e){
+    e.preventDefault();
+    cropDrag.on=true;cropDrag.sx=e.clientX;cropDrag.sy=e.clientY;cropDrag.ox=cropX;cropDrag.oy=cropY;
+  });
+  ca.addEventListener('touchstart',function(e){
+    var t=e.touches[0];
+    cropDrag.on=true;cropDrag.sx=t.clientX;cropDrag.sy=t.clientY;cropDrag.ox=cropX;cropDrag.oy=cropY;
+  },{passive:true});
+  ca.addEventListener('touchmove',function(e){
+    if(!cropDrag.on)return;
+    var t=e.touches[0];
+    cropX=cropDrag.ox+(t.clientX-cropDrag.sx);
+    cropY=cropDrag.oy+(t.clientY-cropDrag.sy);
+    renderCrop();e.preventDefault();
+  },{passive:false});
+  ca.addEventListener('touchend',function(){cropDrag.on=false;});
+  document.getElementById('cropZoom').addEventListener('input',function(){
+    var area=document.getElementById('cropArea');
+    var aw=area.offsetWidth||300;var ah=area.offsetHeight||300;
+    var base=Math.max(aw/cropNatW,ah/cropNatH);
+    cropScale=base*(parseInt(this.value)/100);
+    renderCrop();
+  });
 });
+window.addEventListener('mousemove',function(e){
+  if(!cropDrag.on)return;
+  cropX=cropDrag.ox+(e.clientX-cropDrag.sx);
+  cropY=cropDrag.oy+(e.clientY-cropDrag.sy);
+  renderCrop();
+});
+window.addEventListener('mouseup',function(){cropDrag.on=false;});
 
-// ===== SCROLL =====
-window.addEventListener('scroll',function(){var b=document.getElementById('backTop');if(b)b.style.display=window.scrollY>300?'flex':'none';});
-
-// ===== INIT =====
-// ===== VERSÍCULOS DA BÍBLIA =====
-var VERSICULOS = [
-  {texto:"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.",ref:"João 3:16"},
-  {texto:"O Senhor é o meu pastor e nada me faltará.",ref:"Salmos 23:1"},
-  {texto:"Tudo posso naquele que me fortalece.",ref:"Filipenses 4:13"},
-  {texto:"Porque sou eu que conheço os planos que tenho para vocês, planos de fazê-los prosperar e não de causar dano, planos de dar a vocês esperança e um futuro.",ref:"Jeremias 29:11"},
-  {texto:"Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.",ref:"Salmos 37:5"},
-  {texto:"Não temas, porque eu sou contigo; não te assombres, porque eu sou teu Deus; eu te fortaleço, e te ajudo, e te sustento com a destra da minha justiça.",ref:"Isaías 41:10"},
-  {texto:"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti e tenha misericórdia de ti.",ref:"Números 6:24-25"},
-  {texto:"Mas os que esperam no Senhor renovarão as suas forças, subirão com asas como águias, correrão e não se cansarão, caminharão e não se fatigarão.",ref:"Isaías 40:31"},
-  {texto:"Aquietai-vos e sabei que eu sou Deus.",ref:"Salmos 46:10"},
-  {texto:"Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos.",ref:"Filipenses 4:4"},
-  {texto:"Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei.",ref:"Mateus 11:28"},
-  {texto:"Porque eu sei os pensamentos que tenho a vosso respeito, diz o Senhor; pensamentos de paz e não de mal.",ref:"Jeremias 29:11"},
-  {texto:"Busca a Deus em primeiro lugar o seu reino e a sua justiça, e todas estas coisas vos serão acrescentadas.",ref:"Mateus 6:33"},
-  {texto:"Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.",ref:"Provérbios 3:5"},
-  {texto:"Sede fortes e corajosos! Não tenhais medo nem terror deles, pois é o Senhor, o teu Deus, que marcha contigo.",ref:"Deuteronômio 31:6"},
-  {texto:"Porque a minha força se aperfeiçoa na fraqueza.",ref:"2 Coríntios 12:9"},
-  {texto:"A paz de Deus, que excede todo o entendimento, guardará os vossos corações e os vossos pensamentos em Cristo Jesus.",ref:"Filipenses 4:7"},
-  {texto:"O amor é paciente, é benigno; o amor não arde em ciúmes, não se vangloria, não se ensoberbece.",ref:"1 Coríntios 13:4"},
-  {texto:"Bendize, ó minha alma, ao Senhor, e tudo o que há em mim bendiga o seu santo nome.",ref:"Salmos 103:1"},
-  {texto:"Esta é a vitória que vence o mundo: a nossa fé.",ref:"1 João 5:4"}
-];
-var versUsados=[], versTimer=null;
-
-function getVersAleat(){
-  if(versUsados.length>=VERSICULOS.length) versUsados=[];
-  var disponiveis=VERSICULOS.filter(function(_,i){return !versUsados.includes(i);});
-  var idx=Math.floor(Math.random()*disponiveis.length);
-  var v=disponiveis[idx];
-  versUsados.push(VERSICULOS.indexOf(v));
-  return v;
-}
-
-function addVersSlide(){
-  // Legacy - just update text if slide exists
-  updateVersText();
-}
-
-function showVersSlide(){
-  var track=document.getElementById('cTrack');
-  if(!track) return;
-  addVersSlide();
-  var total=track.children.length;
-  goCar(total-1);
-}
-
-function startVersTimer(){
-  clearInterval(versTimer);
-  // Change verse text every 2 minutes (keep slide permanent)
-  versTimer=setInterval(function(){
-    updateVersText();
-  },2*60*1000);
-}
-
-function updateVersText(){
-  var slide=document.getElementById('versSlidEl');
-  if(!slide) return;
-  var v=getVersAleat();
-  var vtxt=slide.querySelector('.vtxt');
-  var vref=slide.querySelector('.vref');
-  if(!vtxt||!vref) return;
-  // Fade out
-  vtxt.style.opacity='0';vref.style.opacity='0';
-  setTimeout(function(){
-    vtxt.textContent='“'+v.texto+'”';
-    vref.textContent='— '+v.ref;
-    // Fade in
-    vtxt.style.opacity='1';vref.style.opacity='1';
-  },500);
-}
 
 
 // ===== VISITAS (Supabase RPC) =====
@@ -2171,141 +2069,6 @@ async function init(){
   restoreFromHash();
 }
 init();
-
-// ===== IMAGE CROP SYSTEM =====
-var cropCallback=null;
-var cropState={scale:1,x:0,y:0,dragging:false,startX:0,startY:0,lastX:0,lastY:0};
-
-function openCrop(file, callback){
-  cropCallback=callback;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var img=document.getElementById('cropImg');
-    img.onload=function(){
-      cropState={scale:1,x:0,y:0,dragging:false,startX:0,startY:0,lastX:0,lastY:0};
-      document.getElementById('cropZoom').value=100;
-      setTimeout(function(){
-        fitImage();
-        document.getElementById('cropModal').classList.add('on');
-      },50);
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function fitImage(){
-  var img=document.getElementById('cropImg');
-  var area=document.getElementById('cropArea');
-  var aw=area.offsetWidth||300;
-  var ah=area.offsetHeight||300;
-  var iw=img.naturalWidth||1;
-  var ih=img.naturalHeight||1;
-  // Scale to cover area
-  cropState.scale=Math.max(aw/iw, ah/ih);
-  cropState.x=0;
-  cropState.y=0;
-  applyCrop();
-}
-
-function applyCrop(){
-  var img=document.getElementById('cropImg');
-  var area=document.getElementById('cropArea');
-  var aw=area.offsetWidth||300;
-  var ah=area.offsetHeight||300;
-  var iw=img.naturalWidth||1;
-  var ih=img.naturalHeight||1;
-  var s=cropState.scale;
-  var sw=iw*s, sh=ih*s;
-  // Clamp so image always covers area
-  var maxX=(sw-aw)/2;
-  var maxY=(sh-ah)/2;
-  cropState.x=Math.max(-maxX,Math.min(maxX,cropState.x));
-  cropState.y=Math.max(-maxY,Math.min(maxY,cropState.y));
-  img.style.position='absolute';
-  img.style.width=sw+'px';
-  img.style.height=sh+'px';
-  img.style.left=((aw-sw)/2+cropState.x)+'px';
-  img.style.top=((ah-sh)/2+cropState.y)+'px';
-  img.style.maxWidth='none';
-  img.style.maxHeight='none';
-  img.style.userSelect='none';
-  img.style.pointerEvents='none';
-}
-
-function cancelCrop(){
-  document.getElementById('cropModal').classList.remove('on');
-  cropCallback=null;
-}
-
-function confirmCrop(){
-  var img=document.getElementById('cropImg');
-  var area=document.getElementById('cropArea');
-  var aw=area.offsetWidth||300;
-  var ah=area.offsetHeight||300;
-  var iw=img.naturalWidth||1;
-  var ih=img.naturalHeight||1;
-  var s=cropState.scale;
-  var sw=iw*s, sh=ih*s;
-  var offsetX=(aw-sw)/2+cropState.x;
-  var offsetY=(ah-sh)/2+cropState.y;
-  // Source coordinates
-  var sx=-offsetX/s;
-  var sy=-offsetY/s;
-  var sw2=aw/s;
-  var sh2=ah/s;
-  var canvas=document.createElement('canvas');
-  canvas.width=600;canvas.height=600;
-  var ctx=canvas.getContext('2d');
-  ctx.fillStyle='#f5f5f5';
-  ctx.fillRect(0,0,600,600);
-  ctx.drawImage(img,sx,sy,sw2,sh2,0,0,600,600);
-  canvas.toBlob(function(blob){
-    var file=new File([blob],'crop_'+Date.now()+'.jpg',{type:'image/jpeg'});
-    document.getElementById('cropModal').classList.remove('on');
-    if(cropCallback) cropCallback(file, canvas.toDataURL('image/jpeg',0.92));
-    cropCallback=null;
-  },'image/jpeg',0.92);
-}
-
-// Drag events
-var cropArea=document.getElementById('cropArea');
-function startDrag(clientX,clientY){
-  cropState.dragging=true;
-  cropState.startX=clientX-cropState.x;
-  cropState.startY=clientY-cropState.y;
-}
-function moveDrag(clientX,clientY){
-  if(!cropState.dragging) return;
-  cropState.x=clientX-cropState.startX;
-  cropState.y=clientY-cropState.startY;
-  applyCrop();
-}
-function endDrag(){cropState.dragging=false;}
-
-cropArea.addEventListener('mousedown',function(e){e.preventDefault();startDrag(e.clientX,e.clientY);});
-window.addEventListener('mousemove',function(e){moveDrag(e.clientX,e.clientY);});
-window.addEventListener('mouseup',endDrag);
-cropArea.addEventListener('touchstart',function(e){var t=e.touches[0];startDrag(t.clientX,t.clientY);},{passive:true});
-cropArea.addEventListener('touchmove',function(e){var t=e.touches[0];moveDrag(t.clientX,t.clientY);e.preventDefault();},{passive:false});
-cropArea.addEventListener('touchend',endDrag);
-
-// Zoom slider
-document.getElementById('cropZoom').addEventListener('input',function(){
-  var img=document.getElementById('cropImg');
-  var area=document.getElementById('cropArea');
-  var aw=area.offsetWidth||300;
-  var ah=area.offsetHeight||300;
-  var iw=img.naturalWidth||1;
-  var ih=img.naturalHeight||1;
-  var baseScale=Math.max(aw/iw,ah/ih);
-  var zoom=parseInt(this.value)/100;
-  cropState.scale=baseScale*zoom;
-  applyCrop();
-});
-
-
-// ===== URL HASH NAVIGATION =====
 
 
 window.addEventListener('popstate',function(){
