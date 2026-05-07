@@ -168,6 +168,19 @@ main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;}
 .wpp-prod{width:100%;background:#25d366;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Sora',sans-serif;text-decoration:none;margin-bottom:8px;white-space:nowrap;}
 .wpp-prod:hover{background:#1fba58;}
 .share-btn{width:100%;background:#f2f2f2;border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;}
+/* HORIZONTAL GALLERY */
+.gallery-wrap{display:flex;flex-direction:row;gap:10px;margin-bottom:16px;align-items:flex-start;width:100%;}
+.g-thumbs-h{position:relative;width:100%;overflow:hidden;margin-bottom:16px;}
+.g-track{display:flex;gap:10px;transition:transform .4s ease;will-change:transform;}
+.g-slide{flex-shrink:0;border-radius:12px;overflow:hidden;cursor:pointer;position:relative;}
+.g-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.g-slide.active{box-shadow:0 0 0 3px var(--red);}
+.g-arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:all .15s;}
+.g-arr:hover{background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.g-arr.l{left:8px;}.g-arr.r{right:8px;}
+.g-heart{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.9);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);}
+.g-main-wrap{position:relative;width:100%;border-radius:12px;overflow:hidden;background:#f5f0ee;margin-bottom:10px;}
+
 .safety-box{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px;margin-top:14px;font-size:12px;color:#666;line-height:1.6;}
 
 /* FOOTER */
@@ -459,9 +472,18 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
     <div class="breadcrumb"><a onclick="showHome()" style="color:var(--red);cursor:pointer;">🏠 Início</a> <span style="color:#bbb;margin:0 4px;">›</span> <span id="bcCat"></span> <span style="color:#bbb;margin:0 4px;" id="bcArrow2">›</span> <span id="bcTitle"></span></div>
     <div class="prod-grid">
       <div>
-        <div id="galleryWrap" style="display:flex!important;flex-direction:row!important;gap:10px;margin-bottom:16px;align-items:flex-start;width:100%;">
-          <div id="gThumbs" style="display:flex!important;flex-direction:column!important;gap:6px;flex-shrink:0;width:72px;"></div>
-          <div id="galleryMain" style="flex:1;height:420px;background:#f8f8f8;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;"><span id="gEmoji">🏷️</span></div>
+        <!-- MAIN IMAGE -->
+        <div class="g-main-wrap" id="galleryMainWrap">
+          <div id="galleryMain" style="width:100%;height:380px;background:#f8f8f8;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;overflow:hidden;">
+            <span id="gEmoji">🏷️</span>
+          </div>
+          <button class="g-heart" onclick="shareAd()">♡</button>
+        </div>
+        <!-- THUMBNAIL STRIP -->
+        <div class="g-thumbs-h" id="gThumbsWrap" style="display:none;">
+          <div id="gTrack" class="g-track"></div>
+          <button class="g-arr l" id="gPrev" onclick="moveGallery(-1)">‹</button>
+          <button class="g-arr r" id="gNext" onclick="moveGallery(1)">›</button>
         </div>
         <div class="prod-desc">
           <h3>📋 Descrição</h3>
@@ -1303,39 +1325,40 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
     // Gallery
     galleryFotos=a.fotos||[];galIdx=0;
     var gm=document.getElementById('galleryMain');
-    var gt=document.getElementById('gThumbs');
-    gm.querySelectorAll('img,.g-nav').forEach(function(e){e.remove();});
+    gm.querySelectorAll('img').forEach(function(e){e.remove();});
     var emj=document.getElementById('gEmoji');
     emj.style.display=galleryFotos.length?'none':'block';
     emj.textContent=a.emoji||'🏷️';
-    gt.innerHTML='';
+
+    var thumbsWrap=document.getElementById('gThumbsWrap');
+    var gTrack=document.getElementById('gTrack');
+    gTrack.innerHTML='';
     if(galleryFotos.length){
+      // Show thumbnails strip
+      thumbsWrap.style.display='block';
+      // Big main image - show first
+      var mainImg=document.createElement('img');
+      mainImg.id='gMainImg';
+      mainImg.src=galleryFotos[0];
+      mainImg.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;';
+      gm.appendChild(mainImg);
+      // Thumbnail slides
+      var slideW=120,gap=10;
       galleryFotos.forEach(function(src,i){
-        // Big image
+        var slide=document.createElement('div');
+        slide.className='g-slide'+(i===0?' active':'');
+        slide.style.cssText='width:'+slideW+'px;height:'+slideW+'px;flex-shrink:0;';
         var img=document.createElement('img');
-        img.src=src;
-        img.alt='Foto '+(i+1);
-        img.style.cssText='width:100%;height:100%;object-fit:contain;padding:10px;position:absolute;top:0;left:0;display:'+(i===0?'block':'none')+';';
-        gm.appendChild(img);
-        // Thumbnail
-        var th=document.createElement('div');
-        th.style.cssText='width:70px;height:70px;border-radius:8px;overflow:hidden;cursor:pointer;border:'+(i===0?'2px solid var(--red)':'2px solid #eee')+';flex-shrink:0;background:#f5f0ee;';
-        var ti=document.createElement('img');
-        ti.src=src;
-        ti.style.cssText='width:100%;height:100%;object-fit:cover;';
-        th.appendChild(ti);
-        th.onclick=(function(idx){return function(){setGallery(idx);};})(i);
-        gt.appendChild(th);
+        img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;';
+        slide.appendChild(img);
+        slide.onclick=(function(idx){return function(){setGallery(idx);};})(i);
+        gTrack.appendChild(slide);
       });
-      if(galleryFotos.length>1){
-        var pv=document.createElement('button');
-        pv.style.cssText='position:absolute;top:50%;transform:translateY(-50%);left:8px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;';
-        pv.textContent='‹';pv.onclick=function(){moveGallery(-1);};
-        var nx=document.createElement('button');
-        nx.style.cssText='position:absolute;top:50%;transform:translateY(-50%);right:8px;background:rgba(0,0,0,.45);color:#fff;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;';
-        nx.textContent='›';nx.onclick=function(){moveGallery(1);};
-        gm.appendChild(pv);gm.appendChild(nx);
-      }
+      // Show/hide arrows
+      document.getElementById('gPrev').style.display=galleryFotos.length>3?'flex':'none';
+      document.getElementById('gNext').style.display=galleryFotos.length>3?'flex':'none';
+    } else {
+      thumbsWrap.style.display='none';
     }
     
   setHash('#produto/'+a.id);
@@ -1348,11 +1371,23 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
   }catch(err){console.error('showProduct error:',err);}
 }
 function setGallery(i){
-  var imgs=Array.from(document.getElementById('galleryMain').querySelectorAll('img'));
-  var ths=document.getElementById('gThumbs').querySelectorAll('.g-thumb');
-  imgs.forEach(function(x,ii){x.style.display=ii===i?'block':'none';});
-  ths.forEach(function(x,ii){x.style.border=ii===i?'2px solid var(--red)':'2px solid #eee';});
   galIdx=i;
+  // Update main image
+  var mainImg=document.getElementById('gMainImg');
+  if(mainImg) mainImg.src=galleryFotos[i];
+  // Update active slide
+  var slides=document.querySelectorAll('.g-slide');
+  slides.forEach(function(s,ii){s.classList.toggle('active',ii===i);});
+  // Scroll track to show active
+  var track=document.getElementById('gTrack');
+  if(track){
+    var slideW=130;
+    var offset=i*slideW;
+    var wrap=document.getElementById('gThumbsWrap');
+    var ww=wrap?wrap.offsetWidth:300;
+    var scrollTo=Math.max(0,offset-(ww/2-slideW/2));
+    track.style.transform='translateX(-'+Math.min(scrollTo,Math.max(0,(galleryFotos.length*slideW)-(ww-60)))+'px)';
+  }
 }
 function moveGallery(d){
   if(!galleryFotos.length) return;
