@@ -1084,8 +1084,10 @@ function selCat(cat){
     window.scrollTo({top:0,behavior:'smooth'});
     return;
   }
+  // Reset subcat state
+  subCatAtivo=null;
   // Check if category has subcategories - show them first
-  if(SUBCATS[cat]&&SUBCATS[cat].length>0&&!subCatAtivo){
+  if(SUBCATS[cat]&&SUBCATS[cat].length>0){
     showSubCats(cat);
     return;
   }
