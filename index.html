@@ -587,13 +587,24 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
           <button onclick="addCat()">+</button>
         </div>
         <div class="adiv"></div>
-        <div class="alabel">Subcategorias de Lojas</div>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Gerencie as subcategorias que aparecem dentro de "Lojas"</p>
-        <div id="lojasSubList"></div>
-        <div class="addrow" style="margin-top:8px;">
-          <input class="ainput" type="text" id="newLojaEmj" placeholder="🏪" style="width:50px;text-align:center;margin-bottom:0;" maxlength="4"/>
-          <input class="ainput" type="text" id="newLojaNm" placeholder="Ex: Lojas de Calçados" style="margin-bottom:0;flex:1;" onkeydown="if(event.key==='Enter')addLojaSub()"/>
-          <button onclick="addLojaSub()">+</button>
+        <div class="alabel">Gerenciar Subcategorias</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Selecione uma categoria à esquerda para gerenciar suas subcategorias.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:300px;">
+          <!-- LEFT: Category list -->
+          <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
+            <div style="background:#f2f2f2;padding:10px 14px;font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;">Categorias</div>
+            <div id="subcatCatList" style="overflow-y:auto;max-height:280px;"></div>
+          </div>
+          <!-- RIGHT: Subcategory list -->
+          <div style="border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">
+            <div style="background:#f2f2f2;padding:10px 14px;font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;" id="subcatRightTitle">Selecione uma categoria</div>
+            <div id="subcatSubList" style="overflow-y:auto;max-height:220px;padding:8px;"></div>
+            <div id="subcatAddRow" style="display:none;padding:8px;border-top:1px solid var(--border);gap:6px;align-items:center;">
+              <input type="text" id="newSubEmj" placeholder="🏷️" maxlength="4" style="width:42px;text-align:center;border:1.5px solid var(--border);border-radius:6px;padding:6px;font-size:15px;outline:none;"/>
+              <input type="text" id="newSubNm" placeholder="Nome da subcategoria" style="flex:1;border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;outline:none;" onkeydown="if(event.key==='Enter')addSubcat()"/>
+              <button onclick="addSubcat()" style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:700;">+</button>
+            </div>
+          </div>
         </div>
       </div>
       <!-- CONFIG -->
@@ -826,7 +837,7 @@ function abrirAdmin(){
   var sa=document.getElementById('cfgStatAds');if(sa)sa.textContent=ads.length;
   var sc=document.getElementById('cfgStatCats');if(sc)sc.textContent=cats.length;
   var sb=document.getElementById('cfgStatBans');if(sb)sb.textContent=banners.length;
-  renderAdList();renderBanList();renderCatList();renderNotifList();renderLojasSubList();
+  renderAdList();renderBanList();renderCatList();renderNotifList();renderSubcatManager();
 }
 function fecharAdmin(){document.getElementById('adminPanel').classList.remove('on');setHash('#');}
 // Admin panel does not close on outside click
@@ -1516,38 +1527,75 @@ async function registrarView(adId){
   return 0;
 }
 
-// ===== SUBCATEGORIAS DE LOJAS =====
-function renderLojasSubList(){
-  var l=document.getElementById('lojasSubList');
-  if(!l) return;
-  var subs=SUBCATS['Lojas']||[];
-  if(!subs.length){l.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;">Nenhuma subcategoria.</div>';return;}
-  l.innerHTML=subs.map(function(s,i){
-    return '<div style="display:flex;align-items:center;gap:8px;background:#f8f8f8;border-radius:8px;padding:8px 10px;margin-bottom:6px;">'
-      +'<span style="font-size:20px;">'+s.emoji+'</span>'
-      +'<span style="flex:1;font-size:13px;font-weight:600;">'+s.nome+'</span>'
-      +'<button onclick="remLojaSub('+i+')" style="background:#fff0ef;border:1px solid #fcc;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;color:var(--red);">✕</button>'
-      +'</div>';
-  }).join('');
+// ===== SUBCATEGORIAS MANAGER =====
+var selectedSubcatCat=null;
+
+function renderLojasSubList(){renderSubcatManager();}
+
+function renderSubcatManager(){
+  var catList=document.getElementById('subcatCatList');
+  if(!catList) return;
+  catList.innerHTML='';
+  // All cats that can have subcats
+  var allCats=cats.map(function(c){return c.nome;});
+  // Also include hardcoded ones
+  Object.keys(SUBCATS).forEach(function(k){if(!allCats.includes(k))allCats.push(k);});
+  allCats.forEach(function(nome){
+    var subs=SUBCATS[nome]||[];
+    var btn=document.createElement('div');
+    btn.style.cssText='padding:10px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;transition:background .15s;'+(selectedSubcatCat===nome?'background:#fff3f0;border-left:3px solid var(--red);':'');
+    var catObj=cats.find(function(c){return c.nome===nome;})||{emoji:'🏷️'};
+    btn.innerHTML='<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;">'
+      +(catObj.imagem?'<img src="'+catObj.imagem+'" style="width:22px;height:22px;border-radius:4px;object-fit:cover;"/>':'<span>'+catObj.emoji+'</span>')
+      +nome+'</div>'
+      +'<span style="font-size:11px;color:#888;background:#f2f2f2;padding:2px 7px;border-radius:10px;">'+subs.length+'</span>';
+    btn.onclick=(function(n){return function(){selectedSubcatCat=n;renderSubcatManager();renderSubcatRight();};})(nome);
+    catList.appendChild(btn);
+  });
+  if(selectedSubcatCat) renderSubcatRight();
 }
 
-function addLojaSub(){
-  var e=document.getElementById('newLojaEmj').value.trim()||'🏪';
-  var n=document.getElementById('newLojaNm').value.trim();
-  if(!n) return;
-  if(!SUBCATS['Lojas']) SUBCATS['Lojas']=[];
-  SUBCATS['Lojas'].push({nome:n,emoji:e});
-  document.getElementById('newLojaNm').value='';
-  document.getElementById('newLojaEmj').value='';
-  renderLojasSubList();
-  // Update subcat dropdown in ad form
+function renderSubcatRight(){
+  var title=document.getElementById('subcatRightTitle');
+  var list=document.getElementById('subcatSubList');
+  var addRow=document.getElementById('subcatAddRow');
+  if(!title||!list||!addRow) return;
+  title.textContent='Subcategorias: '+selectedSubcatCat;
+  addRow.style.display='flex';
+  var subs=SUBCATS[selectedSubcatCat]||[];
+  list.innerHTML='';
+  if(!subs.length){
+    list.innerHTML='<div style="color:#aaa;font-size:12px;padding:10px;text-align:center;">Nenhuma subcategoria ainda</div>';
+    return;
+  }
+  subs.forEach(function(s,i){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 6px;border-radius:6px;margin-bottom:4px;background:#f8f8f8;';
+    row.innerHTML='<span style="font-size:18px;">'+s.emoji+'</span>'
+      +'<span style="flex:1;font-size:12px;font-weight:600;">'+s.nome+'</span>'
+      +'<button onclick="remSubcat('+i+')" style="background:#fff0ef;border:1px solid #fcc;border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer;color:var(--red);">✕</button>';
+    list.appendChild(row);
+  });
+}
+
+function addSubcat(){
+  if(!selectedSubcatCat){toast('Selecione uma categoria!','⚠️');return;}
+  var e=document.getElementById('newSubEmj').value.trim()||'🏷️';
+  var n=document.getElementById('newSubNm').value.trim();
+  if(!n){toast('Digite o nome!','⚠️');return;}
+  if(!SUBCATS[selectedSubcatCat]) SUBCATS[selectedSubcatCat]=[];
+  SUBCATS[selectedSubcatCat].push({nome:n,emoji:e});
+  document.getElementById('newSubNm').value='';
+  document.getElementById('newSubEmj').value='';
+  renderSubcatManager();
   atualizarSubcatSelect();
   toast('Subcategoria adicionada!');
 }
 
-function remLojaSub(i){
-  SUBCATS['Lojas'].splice(i,1);
-  renderLojasSubList();
+function remSubcat(i){
+  if(!selectedSubcatCat) return;
+  SUBCATS[selectedSubcatCat].splice(i,1);
+  renderSubcatManager();
   atualizarSubcatSelect();
   toast('Removida!','🗑️');
 }
