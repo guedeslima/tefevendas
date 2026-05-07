@@ -2339,9 +2339,13 @@ function selSubCat(cat,sub){
   activeCat=cat;
   document.getElementById('mainHdr').style.display='flex';
   var titleEl=document.getElementById('mainTitle');
-  titleEl.innerHTML='<a onclick="voltarCats()" style="color:var(--red);cursor:pointer;font-size:14px;font-weight:400;">← Início</a>'
-    +' &nbsp;›&nbsp; <a onclick="showSubCats(''+cat+'')" style="color:var(--red);cursor:pointer;font-size:14px;font-weight:400;">'+cat+'</a>'
-    +' &nbsp;›&nbsp; '+sub;
+  titleEl.innerHTML='';
+  var bh=document.createElement('span');
+  var a1=document.createElement('a');a1.style.cssText='color:var(--red);cursor:pointer;font-size:14px;font-weight:400;';a1.textContent='← Início';a1.onclick=voltarCats;bh.appendChild(a1);
+  bh.appendChild(document.createTextNode(' › '));
+  var a2=document.createElement('a');a2.style.cssText='color:var(--red);cursor:pointer;font-size:14px;font-weight:400;';a2.textContent=cat;a2.onclick=(function(c){return function(){showSubCats(c);};})(cat);bh.appendChild(a2);
+  bh.appendChild(document.createTextNode(' › '+sub));
+  titleEl.appendChild(bh);
   document.getElementById('resInfo').textContent='';
   var grid=document.getElementById('adsGrid');
   grid.style.gridTemplateColumns='';
