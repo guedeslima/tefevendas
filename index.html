@@ -1625,30 +1625,39 @@ function renderCatList(){
       var ssv=document.createElement('button');
       ssv.style.cssText='background:var(--red);color:#fff;border:none;border-radius:5px;padding:6px 10px;font-size:11px;cursor:pointer;font-weight:600;';
       ssv.textContent='✔';
-      ssv.onclick=(function(catNome,subIdx,nameInp,emjInp){return function(){
-        if(SUBCATS[catNome]){
-          SUBCATS[catNome][subIdx].nome=nameInp.value.trim();
-          SUBCATS[catNome][subIdx].emoji=emjInp.value.trim()||'🏷️';
+      ssv.onclick=(function(catNome,subIdx,nameInp,emjInp,btn){return function(){
+        var nome=nameInp.value.trim();
+        var emoji=emjInp.value.trim()||'🏷️';
+        if(SUBCATS[catNome]&&SUBCATS[catNome][subIdx]){
+          SUBCATS[catNome][subIdx].nome=nome;
+          SUBCATS[catNome][subIdx].emoji=emoji;
         }
-        // Upload image if new one was selected
         var sub=SUBCATS[catNome]&&SUBCATS[catNome][subIdx];
-        if(sub&&sub._newImg){
-          sync(true);
-          uploadFoto(sub._newImg).then(function(url){
+        var newImg=sub&&sub._newImg;
+        if(newImg){
+          // Show loading state
+          btn.textContent='⏳';
+          btn.disabled=true;
+          uploadFoto(newImg).then(function(url){
             SUBCATS[catNome][subIdx].imagem=url;
             SUBCATS[catNome][subIdx]._newImg=null;
-            sync(false);
-            toast('✅ Subcategoria salva com imagem!');
+            btn.textContent='✅';
+            btn.disabled=false;
+            setTimeout(function(){btn.textContent='✔';},2000);
+            toast('✅ Imagem salva na subcategoria!');
             renderCatList();
           }).catch(function(e){
-            sync(false);
-            toast('Erro ao salvar imagem: '+e.message,'❌');
+            btn.textContent='❌';
+            btn.disabled=false;
+            setTimeout(function(){btn.textContent='✔';},2000);
+            toast('Erro: '+e.message,'❌');
           });
         } else {
+          btn.textContent='✅';
+          setTimeout(function(){btn.textContent='✔';},1500);
           toast('✅ Subcategoria salva!');
-          renderCatList();
         }
-      };})(c.nome,si,sni,sei);
+      };})(c.nome,si,sni,sei,ssv);
       subRow.appendChild(ssv);
       // Sub delete
       var sdl=document.createElement('button');
@@ -1701,10 +1710,12 @@ async function salvarCat(i){
   var e=document.getElementById('ce_e_'+i).value.trim()||'🏷️';
   var n=document.getElementById('ce_n_'+i).value.trim();
   if(!n)return;
+  var btn=document.querySelector('#cat_thumb_'+i+'~button');
   sync(true);
   try{
     var upd={nome:n,emoji:e};
     if(cats[i]._newImg){
+      toast('📤 Enviando imagem...','⏳');
       var url=await uploadFoto(cats[i]._newImg);
       upd.imagem=url;
       cats[i].imagem=url;
@@ -1713,7 +1724,7 @@ async function salvarCat(i){
     await sbPatch('categorias',cats[i].id,upd);
     cats[i].nome=n;cats[i].emoji=e;
     renderTopNav();renderCatsGrid();renderCatList();
-    toast('Categoria salva!');
+    toast('✅ Categoria salva!');
   }catch(err){toast('Erro: '+err.message,'❌');}
   sync(false);
 }
