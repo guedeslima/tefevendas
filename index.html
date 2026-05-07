@@ -1634,28 +1634,38 @@ function renderCatList(){
         }
         var sub=SUBCATS[catNome]&&SUBCATS[catNome][subIdx];
         var newImg=sub&&sub._newImg;
-        if(newImg){
-          // Show loading state
-          btn.textContent='⏳';
-          btn.disabled=true;
-          uploadFoto(newImg).then(function(url){
-            SUBCATS[catNome][subIdx].imagem=url;
+        btn.textContent='⏳';btn.disabled=true;
+        var saveSubcat=function(imgUrl){
+          var subId=sub&&sub.id;
+          var updateObj={nome:nome,emoji:emoji};
+          if(imgUrl) updateObj.imagem=imgUrl;
+          var p=subId
+            ?fetch(SB+'/rest/v1/subcategorias?id=eq.'+subId,{method:'PATCH',headers:HW,body:JSON.stringify(updateObj)})
+            :fetch(SB+'/rest/v1/subcategorias',{method:'POST',headers:HW,body:JSON.stringify(Object.assign({categoria:catNome,ordem:subIdx+1},updateObj))});
+          p.then(function(r){
+            if(!r.ok)throw new Error('Erro ao salvar');
+            return r.json();
+          }).then(function(data){
+            if(!subId&&data&&data[0]) SUBCATS[catNome][subIdx].id=data[0].id;
+            if(imgUrl) SUBCATS[catNome][subIdx].imagem=imgUrl;
             SUBCATS[catNome][subIdx]._newImg=null;
-            btn.textContent='✅';
-            btn.disabled=false;
+            btn.textContent='✅';btn.disabled=false;
             setTimeout(function(){btn.textContent='✔';},2000);
-            toast('✅ Imagem salva na subcategoria!');
+            toast('✅ Subcategoria salva!');
             renderCatList();
           }).catch(function(e){
-            btn.textContent='❌';
-            btn.disabled=false;
+            btn.textContent='❌';btn.disabled=false;
             setTimeout(function(){btn.textContent='✔';},2000);
             toast('Erro: '+e.message,'❌');
           });
+        };
+        if(newImg){
+          uploadFoto(newImg).then(function(url){saveSubcat(url);}).catch(function(e){
+            btn.textContent='❌';btn.disabled=false;
+            toast('Erro upload: '+e.message,'❌');
+          });
         } else {
-          btn.textContent='✅';
-          setTimeout(function(){btn.textContent='✔';},1500);
-          toast('✅ Subcategoria salva!');
+          saveSubcat(null);
         }
       };})(c.nome,si,sni,sei,ssv);
       subRow.appendChild(ssv);
@@ -1698,11 +1708,24 @@ function addSubcatTo(catNome,emjInp,nmInp){
   var n=nmInp.value.trim();
   if(!n){toast('Digite o nome!','⚠️');return;}
   if(!SUBCATS[catNome])SUBCATS[catNome]=[];
-  SUBCATS[catNome].push({nome:n,emoji:e});
-  emjInp.value='';nmInp.value='';
-  renderCatList();
-  atualizarSubcatSelect();
-  toast('Subcategoria adicionada!');
+  var ordem=SUBCATS[catNome].length+1;
+  // Save to Supabase
+  fetch(SB+'/rest/v1/subcategorias',{method:'POST',headers:HW,body:JSON.stringify({categoria:catNome,nome:n,emoji:e,ordem:ordem})})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var newSub={nome:n,emoji:e,imagem:null};
+      if(data&&data[0]) newSub.id=data[0].id;
+      SUBCATS[catNome].push(newSub);
+      emjInp.value='';nmInp.value='';
+      renderCatList();atualizarSubcatSelect();
+      toast('✅ Subcategoria adicionada!');
+    }).catch(function(){
+      // Save locally anyway
+      SUBCATS[catNome].push({nome:n,emoji:e,imagem:null});
+      emjInp.value='';nmInp.value='';
+      renderCatList();atualizarSubcatSelect();
+      toast('Subcategoria adicionada (local)');
+    });
 }
 
 
@@ -1914,6 +1937,11 @@ function addSubcat(){
 
 function remSubcat(i){
   if(!selectedSubcatCat) return;
+  var sub=SUBCATS[selectedSubcatCat][i];
+  if(sub&&sub.id){
+    fetch(SB+'/rest/v1/subcategorias?id=eq.'+sub.id,{method:'DELETE',headers:HG})
+      .catch(function(e){console.warn('Del subcat:',e);});
+  }
   SUBCATS[selectedSubcatCat].splice(i,1);
   renderSubcatManager();
   atualizarSubcatSelect();
@@ -2183,6 +2211,17 @@ async function init(){
   aplicarConfig();
   initVisitas();
   try{cats=await sbGet('categorias','select=*&order=ordem.asc');}catch(e){console.warn('Cats:',e);}
+  // Load subcats from Supabase
+  try{
+    var subcatRows=await sbGet('subcategorias','select=*&order=categoria.asc,ordem.asc');
+    // Reset SUBCATS from DB
+    subcatRows.forEach(function(r){
+      if(!SUBCATS[r.categoria]) SUBCATS[r.categoria]=[];
+      // Avoid duplicates
+      var exists=SUBCATS[r.categoria].find(function(s){return s.nome===r.nome;});
+      if(!exists) SUBCATS[r.categoria].push({id:r.id,nome:r.nome,emoji:r.emoji||'🏷️',imagem:r.imagem||null});
+    });
+  }catch(e){console.warn('Subcats:',e);}
   try{ads=await sbGet('anuncios','select=*&ativo=eq.true&order=destaque.desc,criado_em.desc');}catch(e){console.warn('Ads:',e);}
   try{banners=await sbGet('banners','select=*&ativo=eq.true&order=ordem.asc');}catch(e){console.warn('Banners:',e);}
   renderCarousel();renderTopNav();renderCatsGrid();renderAds();
