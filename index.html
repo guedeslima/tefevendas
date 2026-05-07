@@ -2214,13 +2214,13 @@ async function init(){
   // Load subcats from Supabase
   try{
     var subcatRows=await sbGet('subcategorias','select=*&order=categoria.asc,ordem.asc');
-    // Reset SUBCATS from DB
+    // Reset SUBCATS from DB - clear existing first
+    Object.keys(SUBCATS).forEach(function(k){SUBCATS[k]=[];});
     subcatRows.forEach(function(r){
       if(!SUBCATS[r.categoria]) SUBCATS[r.categoria]=[];
-      // Avoid duplicates
-      var exists=SUBCATS[r.categoria].find(function(s){return s.nome===r.nome;});
-      if(!exists) SUBCATS[r.categoria].push({id:r.id,nome:r.nome,emoji:r.emoji||'🏷️',imagem:r.imagem||null});
+      SUBCATS[r.categoria].push({id:r.id,nome:r.nome,emoji:r.emoji||'🏷️',imagem:r.imagem||null});
     });
+    console.log('Subcats carregadas:', JSON.stringify(Object.keys(SUBCATS).map(function(k){return k+':'+SUBCATS[k].length;})));
   }catch(e){console.warn('Subcats:',e);}
   try{ads=await sbGet('anuncios','select=*&ativo=eq.true&order=destaque.desc,criado_em.desc');}catch(e){console.warn('Ads:',e);}
   try{banners=await sbGet('banners','select=*&ativo=eq.true&order=ordem.asc');}catch(e){console.warn('Banners:',e);}
