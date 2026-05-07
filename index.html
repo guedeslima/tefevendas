@@ -1189,6 +1189,17 @@ function renderAds(){
   });
 }
 
+function voltarCats(){
+  subCatAtivo=null;
+  activeCat='Todos';
+  document.getElementById('homeView').style.display='';
+  document.getElementById('mainHdr').style.display='none';
+  document.getElementById('adsGrid').style.gridTemplateColumns='';
+  renderTopNav();renderCatsGrid();renderAds();
+  setHash('#');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function filterAds(){if(document.getElementById('searchInput').value){activeCat='Todos';document.getElementById('homeView').style.display='none';document.getElementById('mainHdr').style.display='flex';document.getElementById('mainTitle').textContent='Resultados';renderTopNav();renderCatsGrid();}renderAds();}
 
 // ===== PRODUCT PAGE =====
@@ -2347,3 +2358,4 @@ function selSubCat(cat,sub){
   setHash('#subcat/'+encodeURIComponent(cat)+'/'+encodeURIComponent(sub));
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
