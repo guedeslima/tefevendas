@@ -198,7 +198,7 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 .crop-box{background:#fff;border-radius:14px;width:100%;max-width:500px;overflow:hidden;}
 .crop-head{background:#1a0a06;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
 .crop-head h3{color:#fff;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;}
-.crop-area{position:relative;width:100%;height:320px;background:#222;overflow:hidden;touch-action:none;cursor:grab;}
+.crop-area{position:relative;width:100%;height:320px;background:#f0f0f0;overflow:hidden;touch-action:none;cursor:grab;border-radius:8px;}
 .crop-area:active{cursor:grabbing;}
 .crop-frame{position:absolute;inset:0;border:3px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none;}
 .crop-controls{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
@@ -1991,13 +1991,11 @@ function renderCrop(){
   var area=document.getElementById('cropArea');
   var aw=area.offsetWidth||300;
   var ah=area.offsetHeight||300;
+  // Always ensure image covers entire area
+  var minScale=Math.max(aw/cropNatW,ah/cropNatH);
+  if(cropScale<minScale) cropScale=minScale;
   var sw=cropNatW*cropScale;
   var sh=cropNatH*cropScale;
-  // Ensure covers area
-  if(sw<aw||sh<ah){
-    cropScale=Math.max(aw/cropNatW,ah/cropNatH);
-    sw=cropNatW*cropScale;sh=cropNatH*cropScale;
-  }
   var mx=(sw-aw)/2;var my=(sh-ah)/2;
   cropX=Math.max(-mx,Math.min(mx,cropX));
   cropY=Math.max(-my,Math.min(my,cropY));
@@ -2056,6 +2054,9 @@ document.addEventListener('DOMContentLoaded',function(){
     cropScale=base*(parseInt(this.value)/100);
     renderCrop();
   });
+  // Zoom range: 100% = fit, 300% = 3x zoom
+  document.getElementById('cropZoom').min=100;
+  document.getElementById('cropZoom').max=300;
 });
 window.addEventListener('mousemove',function(e){
   if(!cropDrag.on)return;
