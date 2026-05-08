@@ -1150,7 +1150,8 @@ function renderAds(){
   var f=ads.filter(function(a){
     var mc=activeCat==='Todos'||a.categoria===activeCat;
     var ms=!q||a.titulo.toLowerCase().includes(q)||(a.descricao||'').toLowerCase().includes(q);
-    return mc&&ms;
+    var ma=a.ativo!==false; // only show active ads
+    return mc&&ms&&ma;
   });
   document.getElementById('resInfo').textContent=f.length+' anúncio'+(f.length!==1?'s':'');
   var g=document.getElementById('adsGrid'),em=document.getElementById('emptyEl');
@@ -1424,10 +1425,15 @@ function renderAdList(){
       var sub=a.subcategoria?' · '+a.subcategoria:'';
       var row=document.createElement('div');
       row.className='ad-item';
+      var ativo=a.ativo!==false;
       row.innerHTML='<div class="ad-thumb2">'+th+'</div>'
-        +'<div class="ad-info"><div class="ad-info-title">'+a.titulo+'</div>'
+        +'<div class="ad-info"><div class="ad-info-title">'+a.titulo+(ativo?'':' <span style="background:#e33;color:#fff;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;">OFF</span>')+'</div>'
         +'<div class="ad-info-sub">'+(a.preco?'R$ '+a.preco+' · ':'')+a.categoria+sub+(a.destaque?' · ⭐':'')+'</div></div>'
-        +'<div class="ad-btns"><button class="bedit" onclick="abrirFormAd('+a.id+')">✏️</button><button class="bdel" onclick="delAd('+a.id+')">✕</button></div>';
+        +'<div class="ad-btns">'
+        +'<button onclick="toggleAtivo('+a.id+','+ativo+')" style="background:'+(ativo?'#e8f5e9':'#fff0ef')+';border:1px solid '+(ativo?'#a5d6a7':'#fcc')+';border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer;color:'+(ativo?'#2e7d32':'#e33')+';font-weight:700;" title="'+(ativo?'Desativar':'Ativar')+'">'+(ativo?'🟢 ON':'🔴 OFF')+'</button>'
+        +'<button class="bedit" onclick="abrirFormAd('+a.id+')">✏️</button>'
+        +'<button class="bdel" onclick="delAd('+a.id+')">✕</button>'
+        +'</div>';
       l.appendChild(row);
     });
   });
@@ -1481,6 +1487,31 @@ var end=document.getElementById('adEndereco').value.trim();var desc=document.get
 var specs=document.getElementById('adSpecs').value.trim();
 var disp=document.getElementById('adDisp').value.trim();
 var subcat=document.getElementById('adSubcat')?document.getElementById('adSubcat').value:'';var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,subcategoria:subcat,whatsapp:w,whatsapp2:w2,local:loc,endereco:end,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
+async function toggleAtivo(id, atual){
+  var novoStatus=!atual;
+  var msg=novoStatus?'Ativar anúncio?':'Desativar anúncio?';
+  var detalhe=novoStatus?'O anúncio voltará a aparecer no site.':'O anúncio ficará oculto no site mas não será excluído.';
+  var btn=novoStatus?'Ativar':'Desativar';
+  var cor=novoStatus?'#2e7d32':'#e33';
+  confirm2(novoStatus?'🟢':'🔴',msg,detalhe,btn,cor,async function(){
+    sync(true);
+    try{
+      await sbPatch('anuncios',id,{ativo:novoStatus});
+      var idx=ads.findIndex(function(a){return a.id===id;});
+      if(idx>-1) ads[idx].ativo=novoStatus;
+      // Reload ads (only active ones shown on site)
+      if(!novoStatus){
+        // Keep in local array but mark as inactive
+        ads[idx].ativo=false;
+      }
+      renderAdList();
+      renderAds();
+      toast(novoStatus?'🟢 Anúncio ativado!':'🔴 Anúncio desativado!');
+    }catch(e){toast('Erro: '+e.message,'❌');}
+    sync(false);
+  });
+}
+
 async function delAd(id){confirm2('🗑️','Excluir anúncio?','Será removido permanentemente.','Excluir','#e33',async function(){sync(true);try{await sbDel('anuncios',id);ads=ads.filter(function(a){return a.id!==id;});renderAds();renderCatsGrid();renderAdList();toast('Excluído!','🗑️');}catch(e){toast('Erro!','❌');}sync(false);});}
 function fecharFormAd(){document.getElementById('adFormOv').classList.remove('on');abrirAdmin();}
 document.getElementById('adFormOv').addEventListener('click',function(e){if(e.target===this)fecharFormAd();});
