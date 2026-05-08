@@ -1673,12 +1673,19 @@ function renderCatList(){
       var sdl=document.createElement('button');
       sdl.style.cssText='background:#fff0ef;border:1px solid #fcc;border-radius:5px;padding:6px 8px;font-size:11px;cursor:pointer;color:var(--red);';
       sdl.textContent='✕';
-      sdl.onclick=(function(catNome,subIdx){return function(){
-        if(SUBCATS[catNome])SUBCATS[catNome].splice(subIdx,1);
-        renderCatList();
-        atualizarSubcatSelect();
-        toast('Removida!','🗑️');
-      };})(c.nome,si);
+      sdl.onclick=(function(catNome,subIdx,subNome){return function(){
+        confirm2('🗑️','Remover subcategoria?','"'+subNome+'" será removida permanentemente.','Remover','#e33',function(){
+          var sub=SUBCATS[catNome]&&SUBCATS[catNome][subIdx];
+          if(sub&&sub.id){
+            fetch(SB+'/rest/v1/subcategorias?id=eq.'+sub.id,{method:'DELETE',headers:HG})
+              .catch(function(e){console.warn('Del subcat:',e);});
+          }
+          if(SUBCATS[catNome])SUBCATS[catNome].splice(subIdx,1);
+          renderCatList();
+          atualizarSubcatSelect();
+          toast('Removida!','🗑️');
+        });
+      };})(c.nome,si,s.nome);
       subRow.appendChild(sdl);
       subSec.appendChild(subRow);
     });
@@ -1938,14 +1945,16 @@ function addSubcat(){
 function remSubcat(i){
   if(!selectedSubcatCat) return;
   var sub=SUBCATS[selectedSubcatCat][i];
-  if(sub&&sub.id){
-    fetch(SB+'/rest/v1/subcategorias?id=eq.'+sub.id,{method:'DELETE',headers:HG})
-      .catch(function(e){console.warn('Del subcat:',e);});
-  }
-  SUBCATS[selectedSubcatCat].splice(i,1);
-  renderSubcatManager();
-  atualizarSubcatSelect();
-  toast('Removida!','🗑️');
+  confirm2('🗑️','Remover subcategoria?','"'+(sub?sub.nome:'')+'" será removida permanentemente.','Remover','#e33',function(){
+    if(sub&&sub.id){
+      fetch(SB+'/rest/v1/subcategorias?id=eq.'+sub.id,{method:'DELETE',headers:HG})
+        .catch(function(e){console.warn('Del subcat:',e);});
+    }
+    SUBCATS[selectedSubcatCat].splice(i,1);
+    renderSubcatManager();
+    atualizarSubcatSelect();
+    toast('Removida!','🗑️');
+  });
 }
 
 function atualizarSubcatSelect(){
