@@ -473,18 +473,18 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
     <div class="breadcrumb"><a onclick="showHome()" style="color:var(--red);cursor:pointer;">🏠 Início</a> <span style="color:#bbb;margin:0 4px;">›</span> <span id="bcCat"></span> <span style="color:#bbb;margin:0 4px;" id="bcArrow2">›</span> <span id="bcTitle"></span></div>
     <div class="prod-grid">
       <div>
-        <!-- MAIN IMAGE -->
-        <div class="g-main-wrap" id="galleryMainWrap">
-          <div id="galleryMain" style="width:100%;height:380px;background:#f8f8f8;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;overflow:hidden;">
-            <span id="gEmoji">🏷️</span>
+        <!-- GALLERY: thumbs left, main right -->
+        <div style="display:flex;gap:10px;margin-bottom:16px;align-items:flex-start;">
+          <!-- Thumbnails column on left -->
+          <div id="gThumbsWrap" style="display:none;flex-direction:column;gap:8px;flex-shrink:0;width:72px;max-height:460px;overflow-y:auto;scrollbar-width:none;">
           </div>
-          <button class="g-heart" onclick="shareAd()">♡</button>
-        </div>
-        <!-- THUMBNAIL STRIP -->
-        <div class="g-thumbs-h" id="gThumbsWrap" style="display:none;">
-          <div id="gTrack" class="g-track"></div>
-          <button class="g-arr l" id="gPrev" onclick="moveGallery(-1)">‹</button>
-          <button class="g-arr r" id="gNext" onclick="moveGallery(1)">›</button>
+          <!-- Main image on right -->
+          <div class="g-main-wrap" id="galleryMainWrap" style="flex:1;position:relative;">
+            <div id="galleryMain" style="width:100%;height:420px;background:#f8f8f8;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;overflow:hidden;">
+              <span id="gEmoji">🏷️</span>
+            </div>
+            <button class="g-heart" onclick="shareAd()">♡</button>
+          </div>
         </div>
         <div class="prod-desc">
           <h3>📋 Descrição</h3>
@@ -1332,32 +1332,27 @@ document.getElementById('prodPrice').textContent=isNumeric?'R$ '+priceVal:priceV
     emj.textContent=a.emoji||'🏷️';
 
     var thumbsWrap=document.getElementById('gThumbsWrap');
-    var gTrack=document.getElementById('gTrack');
-    gTrack.innerHTML='';
+    thumbsWrap.innerHTML='';
     if(galleryFotos.length){
-      // Show thumbnails strip
-      thumbsWrap.style.display='block';
-      // Big main image - show first
+      // Show thumbs column
+      thumbsWrap.style.display='flex';
+      // Big main image
       var mainImg=document.createElement('img');
       mainImg.id='gMainImg';
       mainImg.src=galleryFotos[0];
       mainImg.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:8px;';
       gm.appendChild(mainImg);
-      // Thumbnail slides
-      var slideW=120,gap=10;
+      // Vertical thumbnails
       galleryFotos.forEach(function(src,i){
-        var slide=document.createElement('div');
-        slide.className='g-slide'+(i===0?' active':'');
-        slide.style.cssText='width:'+slideW+'px;height:'+slideW+'px;flex-shrink:0;';
-        var img=document.createElement('img');
-        img.src=src;img.style.cssText='width:100%;height:100%;object-fit:cover;';
-        slide.appendChild(img);
-        slide.onclick=(function(idx){return function(){setGallery(idx);};})(i);
-        gTrack.appendChild(slide);
+        var th=document.createElement('div');
+        th.style.cssText='width:72px;height:72px;border-radius:8px;overflow:hidden;cursor:pointer;flex-shrink:0;border:'+(i===0?'2px solid var(--red)':'2px solid #eee')+';background:#f5f0ee;';
+        var ti=document.createElement('img');
+        ti.src=src;
+        ti.style.cssText='width:100%;height:100%;object-fit:cover;';
+        th.appendChild(ti);
+        th.onclick=(function(idx){return function(){setGallery(idx);};})(i);
+        thumbsWrap.appendChild(th);
       });
-      // Show/hide arrows
-      document.getElementById('gPrev').style.display=galleryFotos.length>3?'flex':'none';
-      document.getElementById('gNext').style.display=galleryFotos.length>3?'flex':'none';
     } else {
       thumbsWrap.style.display='none';
     }
@@ -1376,19 +1371,13 @@ function setGallery(i){
   // Update main image
   var mainImg=document.getElementById('gMainImg');
   if(mainImg) mainImg.src=galleryFotos[i];
-  // Update active slide
-  var slides=document.querySelectorAll('.g-slide');
-  slides.forEach(function(s,ii){s.classList.toggle('active',ii===i);});
-  // Scroll track to show active
-  var track=document.getElementById('gTrack');
-  if(track){
-    var slideW=130;
-    var offset=i*slideW;
-    var wrap=document.getElementById('gThumbsWrap');
-    var ww=wrap?wrap.offsetWidth:300;
-    var scrollTo=Math.max(0,offset-(ww/2-slideW/2));
-    track.style.transform='translateX(-'+Math.min(scrollTo,Math.max(0,(galleryFotos.length*slideW)-(ww-60)))+'px)';
+  // Update active thumb border
+  var thumbs=document.getElementById('gThumbsWrap').children;
+  for(var t=0;t<thumbs.length;t++){
+    thumbs[t].style.border=t===i?'2px solid var(--red)':'2px solid #eee';
   }
+  // Scroll thumb into view
+  if(thumbs[i]) thumbs[i].scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function moveGallery(d){
   if(!galleryFotos.length) return;
