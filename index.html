@@ -2253,7 +2253,7 @@ async function init(){
     });
     console.log('Subcats carregadas:', JSON.stringify(Object.keys(SUBCATS).map(function(k){return k+':'+SUBCATS[k].length;})));
   }catch(e){console.warn('Subcats:',e);}
-  try{ads=await sbGet('anuncios','select=*&ativo=eq.true&order=destaque.desc,criado_em.desc');}catch(e){console.warn('Ads:',e);}
+  try{ads=await sbGet('anuncios','select=*&order=destaque.desc,criado_em.desc');}catch(e){console.warn('Ads:',e);}
   try{banners=await sbGet('banners','select=*&ativo=eq.true&order=ordem.asc');}catch(e){console.warn('Banners:',e);}
   renderCarousel();renderTopNav();renderCatsGrid();renderAds();
   document.getElementById('loadingScreen').style.display='none';
