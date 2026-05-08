@@ -2224,7 +2224,8 @@ async function init(){
   // Load subcats from Supabase
   try{
     var subcatRows=await sbGet('subcategorias','select=*&order=categoria.asc,ordem.asc');
-    // Reset SUBCATS from DB - clear existing first
+    // Load ONLY from Supabase - replace all hardcoded ones
+    // Clear everything first
     Object.keys(SUBCATS).forEach(function(k){SUBCATS[k]=[];});
     subcatRows.forEach(function(r){
       if(!SUBCATS[r.categoria]) SUBCATS[r.categoria]=[];
