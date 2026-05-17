@@ -2479,20 +2479,8 @@ function atualizarUIAuth(){
 }
 
 async function loginGoogle(){
-  try{
-    var r=await fetch(SB_AUTH+'/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.href),{
-      method:'GET',headers:AUTH_H
-    });
-    // Redirect to Google OAuth
-    var data=await r.json();
-    if(data.url) window.location.href=data.url;
-    else {
-      // Direct redirect
-      window.location.href=SB_AUTH+'/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.origin+window.location.pathname);
-    }
-  }catch(e){
-    window.location.href=SB_AUTH+'/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.origin+window.location.pathname);
-  }
+  var redirectTo='https://guedeslima.github.io/tefevendas/';
+  window.location.href=SB_AUTH+'/authorize?provider=google&redirect_to='+encodeURIComponent(redirectTo);
 }
 
 function abrirAnunciarOuLogin(){
