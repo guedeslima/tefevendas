@@ -311,6 +311,30 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
 .bnr-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bnr-sub{font-size:11px;color:var(--muted);margin-top:2px;}
 
+/* AUTH MODAL */
+#authModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;align-items:center;justify-content:center;padding:16px;}
+#authModal.on{display:flex;}
+.auth-box{background:#fff;border-radius:16px;width:100%;max-width:380px;overflow:hidden;}
+.auth-head{background:var(--red);padding:20px 24px;text-align:center;}
+.auth-head h3{font-family:'Sora',sans-serif;color:#fff;font-size:18px;font-weight:700;margin-bottom:4px;}
+.auth-head p{color:rgba(255,255,255,.7);font-size:13px;}
+.auth-body{padding:24px;}
+.auth-tabs{display:flex;background:#f2f2f2;border-radius:8px;padding:4px;margin-bottom:20px;}
+.auth-tab{flex:1;border:none;background:none;border-radius:6px;padding:8px;font-size:13px;font-family:'Sora',sans-serif;font-weight:600;cursor:pointer;color:var(--muted);}
+.auth-tab.on{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.auth-inp{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;outline:none;margin-bottom:12px;font-family:'Inter',sans-serif;}
+.auth-inp:focus{border-color:var(--red);}
+.auth-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.auth-btn:hover{background:var(--red2);}
+.auth-cancel{width:100%;background:none;border:none;font-size:13px;color:var(--muted);cursor:pointer;padding:4px;}
+.user-menu{position:relative;}
+.user-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px;}
+.user-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:200px;z-index:999;overflow:hidden;}
+.user-dropdown.on{display:block;}
+.user-drop-item{padding:12px 16px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f5f5f5;}
+.user-drop-item:hover{background:#f8f8f8;}
+.user-drop-item:last-child{border:none;color:#e33;}
+
 /* RESPONSIVE */
 @media(max-width:900px){.ads-grid{grid-template-columns:repeat(3,1fr);}.prod-grid{grid-template-columns:1fr;}.prod-info-box{position:static;}}
 @media(max-width:640px){
@@ -378,7 +402,15 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
       <input type="text" id="searchInput" placeholder="Buscar produto, categoria..." oninput="filterAds()"/>
       <button onclick="filterAds()">Buscar</button>
     </div>
-    <button class="btn-anunciar" onclick="abrirAnunciar()">+ Anunciar</button>
+    <button class="btn-anunciar" onclick="abrirAnunciarOuLogin()" id="btnAnunciar">+ Anunciar</button>
+    <div class="user-menu" id="userMenu" style="display:none;">
+      <button class="user-btn" onclick="toggleUserMenu()" id="userBtn">👤 <span id="userNome">Conta</span> ▾</button>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-drop-item" onclick="verMeusAnuncios()">📋 Meus anúncios</div>
+        <div class="user-drop-item" onclick="fazerLogout()">🚪 Sair</div>
+      </div>
+    </div>
+    <button class="btn-anunciar" onclick="abrirAuthModal('login')" id="btnEntrar" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);">Entrar</button>
     <div class="sync"><div class="sdot" id="sdot"></div><span id="stxt">online</span></div>
   </div>
 </header>
@@ -445,6 +477,19 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
       </div>
       <div class="price-box"><strong id="priceEl">R$ 10</strong><span>por anúncio</span></div>
     </div>
+
+    <!-- APOIE O SITE -->
+    <div id="pixBanner" style="background:linear-gradient(135deg,#1a3a1a,#2d5a2d);border-radius:12px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="font-size:32px;">💚</div>
+      <div style="flex:1;min-width:180px;">
+        <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">Apoie o TeféVendas!</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;">Este site é gratuito! Se quiser ajudar a manter no ar, doe qualquer valor via Pix. Cada contribuição ajuda muito! 🙏</div>
+      </div>
+      <button onclick="copiarPix()" style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:12px 20px;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;">
+        <span style="font-size:18px;">📋</span> Copiar chave Pix
+      </button>
+    </div>
+
     <div id="mainHdr" style="display:none;" class="main-hdr">
       <h2 id="mainTitle">Todos</h2>
       <span class="res-info" id="resInfo"></span>
@@ -565,6 +610,38 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
   <button class="notif-skip" onclick="fecharNotif()">Agora não</button>
 </div>
 
+<!-- AUTH MODAL -->
+<div id="authModal">
+  <div class="auth-box">
+    <div class="auth-head">
+      <h3>👋 Bem-vindo!</h3>
+      <p id="authHeadTxt">Entre para anunciar gratuitamente</p>
+    </div>
+    <div class="auth-body">
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="tabLogin" onclick="switchAuthTab('login')">Entrar</button>
+        <button class="auth-tab" id="tabCadastro" onclick="switchAuthTab('cadastro')">Cadastrar</button>
+      </div>
+      <div id="authLoginForm">
+        <input class="auth-inp" type="email" id="authEmail" placeholder="Seu email"/>
+        <input class="auth-inp" type="password" id="authSenha" placeholder="Senha"/>
+        <button class="auth-btn" onclick="fazerLogin()">Entrar</button>
+        <div style="text-align:center;margin-bottom:8px;">
+          <a onclick="esqueceuSenha()" style="font-size:12px;color:var(--red);cursor:pointer;">Esqueci minha senha</a>
+        </div>
+      </div>
+      <div id="authCadastroForm" style="display:none;">
+        <input class="auth-inp" type="text" id="authNome" placeholder="Seu nome completo"/>
+        <input class="auth-inp" type="email" id="authEmailC" placeholder="Seu email"/>
+        <input class="auth-inp" type="tel" id="authWppC" placeholder="WhatsApp (opcional)"/>
+        <input class="auth-inp" type="password" id="authSenhaC" placeholder="Criar senha (mín. 6 caracteres)"/>
+        <button class="auth-btn" onclick="fazerCadastro()">Criar conta grátis</button>
+      </div>
+      <button class="auth-cancel" onclick="fecharAuthModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toastEl"></div>
 
@@ -680,6 +757,11 @@ footer{background:#1a0a06;color:rgba(255,255,255,.35);text-align:center;padding:
           </div>
         </div>
         <button class="mred" onclick="salvarAparencia()">💾 Salvar aparência</button>
+        <div class="adiv"></div>
+        <div class="alabel">💚 Pix para apoio do site</div>
+        <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Chave Pix (CPF, telefone, email ou aleatória)</label>
+        <input class="ainput" type="text" id="cfgPix" placeholder="Ex: 5597999999999"/>
+        <button class="mred" onclick="salvarPix()">💾 Salvar chave Pix</button>
         <div class="adiv"></div>
         <div class="alabel">📱 WhatsApp para receber pedidos</div>
         <label style="font-size:12px;color:var(--muted);margin-bottom:4px;display:block;">Número principal (com DDI 55)</label>
@@ -797,6 +879,7 @@ async function uploadFoto(file){var p=Date.now()+Math.random().toString(36).slic
 
 // ===== STATE =====
 var cats=[],ads=[],banners=[],cfg={};
+var currentUser=null;
 var activeCat='Todos',selPag=[],selEmoji='🏷️',editImgs=[],editImgsFiles=[],banImgData='';
 var PIN='123456',MEU_WPP='5597999999999',PRECO='R$ 10',SITE_NOME='TeféVendas',SITE_CIDADE='Tefé, AM',SITE_COR='#d4300a';
 var WPP_MSG='Olá! Vi o anúncio *"{titulo}"* no {site} e tenho interesse! 😊\n\n💰 Valor: R$ {preco}\n📍 {local}\n💳 Pagamento: {pagamento}\n\nAinda está disponível?';
@@ -873,6 +956,8 @@ function abrirAdmin(){
   setHash('#admin');
   document.getElementById('adminPanel').classList.add('on');
   document.getElementById('cfgWpp').value=MEU_WPP;
+  var cfgPixEl=document.getElementById('cfgPix');
+  if(cfgPixEl)cfgPixEl.value=MEU_PIX||'';
   document.getElementById('cfgPreco').value=PRECO;
   document.getElementById('cfgNome').value=SITE_NOME;
   document.getElementById('cfgCidade').value=SITE_CIDADE;
@@ -1486,7 +1571,7 @@ var w2=document.getElementById('adWpp2').value.trim().replace(/\D/g,'');var cat=
 var end=document.getElementById('adEndereco').value.trim();var desc=document.getElementById('adDesc').value.trim();
 var specs=document.getElementById('adSpecs').value.trim();
 var disp=document.getElementById('adDisp').value.trim();
-var subcat=document.getElementById('adSubcat')?document.getElementById('adSubcat').value:'';var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,subcategoria:subcat,whatsapp:w,whatsapp2:w2,local:loc,endereco:end,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
+var subcat=document.getElementById('adSubcat')?document.getElementById('adSubcat').value:'';var emj=document.getElementById('adEmoji').value.trim()||selEmoji||'🏷️';var dest=document.getElementById('adDest').checked;var idv=document.getElementById('adId').value;if(!t||!p||!w){toast('Preencha título, preço e WhatsApp!','⚠️');return;}sync(true);try{var fi=[...editImgs];for(var i=0;i<editImgsFiles.length;i++){if(editImgsFiles[i]){var url=await uploadFoto(editImgsFiles[i]);var b64=fi.findIndex(function(s){return s.startsWith('data:');});if(b64>-1)fi[b64]=url;}}fi=fi.filter(function(s){return !s.startsWith('data:');});var obj={titulo:t,preco:p,categoria:cat,subcategoria:subcat,whatsapp:w,whatsapp2:w2,local:loc,endereco:end,descricao:desc,specs:specs,disponibilidade:disp,emoji:emj,fotos:fi,pagamento:selPag,destaque:dest,ativo:true};if(currentUser)obj.user_id=currentUser.id;if(idv){await sbPatch('anuncios',idv,obj);var idx=ads.findIndex(function(a){return a.id===Number(idv);});if(idx>-1)ads[idx]=Object.assign({id:Number(idv)},obj);toast('Anúncio atualizado!');}else{var cr=await sbPost('anuncios',obj);ads.unshift(cr[0]);toast('Anúncio adicionado!');}renderAds();renderCatsGrid();fecharFormAd();}catch(e){toast('Erro: '+e.message,'❌');}sync(false);}
 async function toggleAtivo(id, atual){
   var novoStatus=!atual;
   var msg=novoStatus?'Ativar anúncio?':'Desativar anúncio?';
@@ -1785,6 +1870,18 @@ async function delCat(id,nome){confirm2('🗂️','Remover categoria?','"'+nome+
 async function salvarAparencia(){sync(true);try{var n=document.getElementById('cfgNome').value.trim();var ci=document.getElementById('cfgCidade').value.trim();var co=document.getElementById('cfgCor').value;if(n){SITE_NOME=n;await sbSaveCfg('site_nome',n);}if(ci){SITE_CIDADE=ci;await sbSaveCfg('site_cidade',ci);}if(co){SITE_COR=co;await sbSaveCfg('site_cor',co);}aplicarConfig();
   initVisitas();
   initNotifPopup();toast('Aparência salva!');}catch(e){toast('Erro!','❌');}sync(false);}
+async function salvarPix(){
+  var v=document.getElementById('cfgPix').value.trim();
+  if(!v)return;
+  sync(true);
+  try{
+    MEU_PIX=v;
+    await sbSaveCfg('meu_pix',v);
+    toast('Chave Pix salva!','💚');
+  }catch(e){toast('Erro!','❌');}
+  sync(false);
+}
+
 async function salvarWpp(){var v=document.getElementById('cfgWpp').value.trim().replace(/\D/g,'');if(!v)return;sync(true);try{MEU_WPP=v;await sbSaveCfg('meu_wpp',v);toast('WhatsApp salvo!');}catch(e){toast('Erro!','❌');}sync(false);}
 async function salvarPreco(){var v=document.getElementById('cfgPreco').value.trim();if(!v)return;sync(true);try{PRECO=v;await sbSaveCfg('preco_anuncio',v);document.getElementById('priceEl').textContent=v;toast('Valor salvo!');}catch(e){toast('Erro!','❌');}sync(false);}
 async function salvarPin(){var p1=document.getElementById('cfgPin1').value;var p2=document.getElementById('cfgPin2').value;if(!/^\d{6}$/.test(p1)){toast('Senha deve ter 6 dígitos!','⚠️');return;}if(p1!==p2){toast('Senhas não coincidem!','⚠️');return;}sync(true);try{PIN=p1;await sbSaveCfg('admin_pin',p1);document.getElementById('cfgPin1').value='';document.getElementById('cfgPin2').value='';toast('Senha alterada!','🔐');}catch(e){toast('Erro!','❌');}sync(false);}
@@ -2120,6 +2217,24 @@ async function initVisitas(){
 }
 
 // ===== COMPARTILHAR =====
+var MEU_PIX='5597999999999'; // Altere para sua chave Pix
+
+function copiarPix(){
+  var chave=MEU_PIX;
+  navigator.clipboard.writeText(chave).then(function(){
+    toast('Chave Pix copiada! Obrigado pelo apoio! 💚','✅');
+  }).catch(function(){
+    // Fallback
+    var inp=document.createElement('input');
+    inp.value=chave;
+    document.body.appendChild(inp);
+    inp.select();
+    document.execCommand('copy');
+    document.body.removeChild(inp);
+    toast('Chave Pix copiada! Obrigado! 💚','✅');
+  });
+}
+
 function shareInstagram(){
   // Instagram doesn't support direct URL share, copy link instead
   var url=window.location.href.split('#')[0];
@@ -2226,12 +2341,239 @@ function restoreFromHash(){
 
 window.addEventListener('popstate',function(){restoreFromHash();});
 
+// ===== AUTH SUPABASE =====
+var SB_AUTH=SB+'/auth/v1';
+var AUTH_H={'apikey':SK,'Content-Type':'application/json'};
+
+async function sbSignUp(email,senha,nome,wpp){
+  var r=await fetch(SB_AUTH+'/signup',{method:'POST',headers:AUTH_H,body:JSON.stringify({email:email,password:senha,data:{nome:nome,whatsapp:wpp}})});
+  var d=await r.json();
+  if(d.error)throw new Error(d.error.message||d.msg||'Erro ao cadastrar');
+  return d;
+}
+
+async function sbSignIn(email,senha){
+  var r=await fetch(SB_AUTH+'/token?grant_type=password',{method:'POST',headers:AUTH_H,body:JSON.stringify({email:email,password:senha})});
+  var d=await r.json();
+  if(d.error||d.error_description)throw new Error(d.error_description||d.error||'Email ou senha incorretos');
+  return d;
+}
+
+async function sbSignOut(token){
+  await fetch(SB_AUTH+'/logout',{method:'POST',headers:Object.assign({},AUTH_H,{'Authorization':'Bearer '+token})});
+}
+
+async function sbGetUser(token){
+  var r=await fetch(SB_AUTH+'/user',{method:'GET',headers:Object.assign({},AUTH_H,{'Authorization':'Bearer '+token})});
+  if(!r.ok)return null;
+  return r.json();
+}
+
+async function sbResetPassword(email){
+  var r=await fetch(SB_AUTH+'/recover',{method:'POST',headers:AUTH_H,body:JSON.stringify({email:email})});
+  return r.ok;
+}
+
+function abrirAuthModal(tab){
+  switchAuthTab(tab||'login');
+  document.getElementById('authModal').classList.add('on');
+}
+function fecharAuthModal(){document.getElementById('authModal').classList.remove('on');}
+
+function switchAuthTab(tab){
+  document.getElementById('tabLogin').classList.toggle('on',tab==='login');
+  document.getElementById('tabCadastro').classList.toggle('on',tab==='cadastro');
+  document.getElementById('authLoginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('authCadastroForm').style.display=tab==='cadastro'?'block':'none';
+  document.getElementById('authHeadTxt').textContent=tab==='login'?'Entre para anunciar gratuitamente':'Crie sua conta grátis em segundos';
+}
+
+async function fazerLogin(){
+  var email=document.getElementById('authEmail').value.trim();
+  var senha=document.getElementById('authSenha').value;
+  if(!email||!senha){toast('Preencha email e senha!','⚠️');return;}
+  var btn=document.querySelector('#authLoginForm .auth-btn');
+  btn.textContent='Entrando...';btn.disabled=true;
+  try{
+    var data=await sbSignIn(email,senha);
+    localStorage.setItem('sb_token',data.access_token);
+    localStorage.setItem('sb_user',JSON.stringify(data.user));
+    currentUser=data.user;
+    atualizarUIAuth();
+    fecharAuthModal();
+    toast('Bem-vindo de volta! 👋');
+  }catch(e){
+    toast(e.message,'❌');
+  }
+  btn.textContent='Entrar';btn.disabled=false;
+}
+
+async function fazerCadastro(){
+  var nome=document.getElementById('authNome').value.trim();
+  var email=document.getElementById('authEmailC').value.trim();
+  var wpp=document.getElementById('authWppC').value.trim().replace(/\D/g,'');
+  var senha=document.getElementById('authSenhaC').value;
+  if(!nome||!email||!senha){toast('Preencha todos os campos!','⚠️');return;}
+  if(senha.length<6){toast('Senha deve ter pelo menos 6 caracteres!','⚠️');return;}
+  var btn=document.querySelector('#authCadastroForm .auth-btn');
+  btn.textContent='Cadastrando...';btn.disabled=true;
+  try{
+    var data=await sbSignUp(email,senha,nome,wpp);
+    if(data.access_token){
+      localStorage.setItem('sb_token',data.access_token);
+      localStorage.setItem('sb_user',JSON.stringify(data.user));
+      currentUser=data.user;
+      atualizarUIAuth();
+      fecharAuthModal();
+      toast('Conta criada! Bem-vindo! 🎉');
+    } else {
+      toast('Conta criada! Verifique seu email para confirmar. 📧');
+      fecharAuthModal();
+    }
+  }catch(e){
+    toast(e.message,'❌');
+  }
+  btn.textContent='Criar conta grátis';btn.disabled=false;
+}
+
+async function fazerLogout(){
+  var token=localStorage.getItem('sb_token');
+  if(token) await sbSignOut(token).catch(function(){});
+  localStorage.removeItem('sb_token');
+  localStorage.removeItem('sb_user');
+  currentUser=null;
+  atualizarUIAuth();
+  toggleUserMenu(true);
+  toast('Até logo! 👋');
+}
+
+async function esqueceuSenha(){
+  var email=document.getElementById('authEmail').value.trim();
+  if(!email){toast('Digite seu email primeiro!','⚠️');return;}
+  await sbResetPassword(email);
+  toast('Email de recuperação enviado! 📧');
+}
+
+function toggleUserMenu(forceClose){
+  var d=document.getElementById('userDropdown');
+  if(forceClose) d.classList.remove('on');
+  else d.classList.toggle('on');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.user-menu')) document.getElementById('userDropdown').classList.remove('on');
+});
+
+function atualizarUIAuth(){
+  var btnEntrar=document.getElementById('btnEntrar');
+  var userMenu=document.getElementById('userMenu');
+  var btnAnunciar=document.getElementById('btnAnunciar');
+  if(currentUser){
+    var nome=(currentUser.user_metadata&&currentUser.user_metadata.nome)||currentUser.email.split('@')[0];
+    document.getElementById('userNome').textContent=nome.split(' ')[0];
+    if(btnEntrar) btnEntrar.style.display='none';
+    if(userMenu) userMenu.style.display='flex';
+    if(btnAnunciar) btnAnunciar.style.display='flex';
+  } else {
+    if(btnEntrar) btnEntrar.style.display='';
+    if(userMenu) userMenu.style.display='none';
+    if(btnAnunciar) btnAnunciar.style.display='none';
+  }
+}
+
+function abrirAnunciarOuLogin(){
+  if(currentUser) abrirFormAdUsuario();
+  else abrirAuthModal('login');
+}
+
+function verMeusAnuncios(){
+  toggleUserMenu(true);
+  if(!currentUser)return;
+  var meusAds=ads.filter(function(a){return a.user_id===currentUser.id;});
+  var ov=document.createElement('div');
+  ov.id='myAdsOv';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  ov.onclick=function(e){if(e.target===ov)ov.remove();};
+  var box=document.createElement('div');
+  box.style.cssText='background:#fff;border-radius:14px;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;';
+  // Header
+  var hd=document.createElement('div');hd.style.cssText='background:var(--red);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:14px 14px 0 0;position:sticky;top:0;';
+  var ht=document.createElement('span');ht.style.cssText='font-family:Sora,sans-serif;color:#fff;font-weight:700;font-size:15px;';ht.textContent='📋 Meus Anúncios';
+  var hx=document.createElement('button');hx.style.cssText='background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;';hx.textContent='×';hx.onclick=function(){ov.remove();};
+  hd.appendChild(ht);hd.appendChild(hx);box.appendChild(hd);
+  // Body
+  var bd=document.createElement('div');bd.style.cssText='padding:16px;';
+  if(!meusAds.length){
+    var em=document.createElement('div');em.style.cssText='text-align:center;padding:30px;color:#888;';em.textContent='Você ainda não tem anúncios.';
+    var cb=document.createElement('button');cb.style.cssText='display:block;margin:16px auto 0;background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;font-family:Sora,sans-serif;font-weight:700;';
+    cb.textContent='+ Criar anúncio';cb.onclick=function(){ov.remove();abrirFormAdUsuario();};
+    em.appendChild(cb);bd.appendChild(em);
+  } else {
+    meusAds.forEach(function(a){
+      var row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;background:#f8f8f8;border-radius:8px;padding:10px;margin-bottom:8px;';
+      var th=document.createElement('div');th.style.cssText='width:52px;height:52px;border-radius:6px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0;';
+      if(a.fotos&&a.fotos[0]){var ti=document.createElement('img');ti.src=a.fotos[0];ti.style.cssText='width:100%;height:100%;object-fit:cover;';th.appendChild(ti);}else{th.textContent=a.emoji||'🏷️';}
+      var info=document.createElement('div');info.style.cssText='flex:1;min-width:0;';
+      var it=document.createElement('div');it.style.cssText='font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';it.textContent=a.titulo;
+      var is=document.createElement('div');is.style.cssText='font-size:11px;color:#888;';is.textContent=a.categoria+' · '+(a.preco||'—')+(a.ativo===false?' · OFF':'');
+      info.appendChild(it);info.appendChild(is);
+      var db=document.createElement('button');db.style.cssText='background:#fff0ef;border:1px solid #fcc;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;color:#e33;flex-shrink:0;';
+      db.textContent='✕';db.onclick=(function(aid){return function(){delMyAd(aid);};})(a.id);
+      row.appendChild(th);row.appendChild(info);row.appendChild(db);bd.appendChild(row);
+    });
+    var nb=document.createElement('button');nb.style.cssText='width:100%;background:var(--red);color:#fff;border:none;border-radius:8px;padding:11px;font-family:Sora,sans-serif;font-weight:700;cursor:pointer;margin-top:8px;';
+    nb.textContent='+ Novo anúncio';nb.onclick=function(){ov.remove();abrirFormAdUsuario();};
+    bd.appendChild(nb);
+  }
+  box.appendChild(bd);ov.appendChild(box);document.body.appendChild(ov);
+}
+async function delMyAd(id){
+  confirm2('🗑️','Excluir anúncio?','Será removido permanentemente.','Excluir','#e33',async function(){
+    try{
+      var token=localStorage.getItem('sb_token');
+      await fetch(SB+'/rest/v1/anuncios?id=eq.'+id,{method:'DELETE',headers:Object.assign({},HG,{'Authorization':'Bearer '+token})});
+      ads=ads.filter(function(a){return a.id!==id;});
+      renderAds();
+      var ov=document.getElementById('myAdsOv');
+      if(ov)ov.remove();
+      verMeusAnuncios();
+      toast('Anúncio excluído!','🗑️');
+    }catch(e){toast('Erro!','❌');}
+  });
+}
+
+function abrirFormAdUsuario(){
+  // Use existing form but with user context
+  abrirFormAd(null);
+  // Mark as user form
+  document.getElementById('adFormOv').dataset.userMode='1';
+}
+
+// ===== LOAD SESSION =====
+async function carregarSessao(){
+  var token=localStorage.getItem('sb_token');
+  if(!token)return;
+  try{
+    var user=await sbGetUser(token);
+    if(user&&user.id){
+      currentUser=user;
+      localStorage.setItem('sb_user',JSON.stringify(user));
+    } else {
+      localStorage.removeItem('sb_token');
+      localStorage.removeItem('sb_user');
+    }
+  }catch(e){
+    localStorage.removeItem('sb_token');
+  }
+  atualizarUIAuth();
+}
+
 async function init(){
   try{
     var cfgRows=await sbGet('config','select=chave,valor');
     cfgRows.forEach(function(r){cfg[r.chave]=r.valor;});
     if(cfg.admin_pin)PIN=cfg.admin_pin;
     if(cfg.meu_wpp)MEU_WPP=cfg.meu_wpp;
+    if(cfg.meu_pix)MEU_PIX=cfg.meu_pix;
     if(cfg.preco_anuncio)PRECO=cfg.preco_anuncio;
     if(cfg.site_nome)SITE_NOME=cfg.site_nome;
     if(cfg.site_cidade)SITE_CIDADE=cfg.site_cidade;
@@ -2239,6 +2581,7 @@ async function init(){
     if(cfg.wpp_msg)WPP_MSG=cfg.wpp_msg;
   }catch(e){console.warn('Config:',e);}
   aplicarConfig();
+  await carregarSessao();
   initVisitas();
   try{cats=await sbGet('categorias','select=*&order=ordem.asc');}catch(e){console.warn('Cats:',e);}
   // Load subcats from Supabase
